@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { EudaChatLogo } from '@/components/brand/EudaChatLogo'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { isSupabaseConfigured } from '@/lib/supabase/config'
 import { createClient } from '@/lib/supabase/server'
 import { ui } from '@/lib/ui'
@@ -24,6 +25,7 @@ export default async function HomePage () {
           </span>
         </div>
         <nav className="flex items-center gap-2">
+          <ThemeToggle />
           <Link href="/login" className={ui.btnGhost}>Sign in</Link>
           <Link href="/signup" className={ui.btnPrimary}>Sign up</Link>
         </nav>

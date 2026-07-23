@@ -1,11 +1,15 @@
 import Link from 'next/link'
 import { AuthForm } from '@/components/AuthForm'
 import { EudaChatLogo } from '@/components/brand/EudaChatLogo'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { ui } from '@/lib/ui'
 
 export default function LoginPage () {
   return (
     <main className={`${ui.meshBg} relative flex min-h-screen flex-col justify-center px-4 py-16`}>
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <div className="mx-auto w-full max-w-md">
         <div className={`${ui.cardElevated} animate-fade-up`}>
           <div className="flex items-start justify-between gap-4">

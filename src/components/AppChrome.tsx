@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { NotificationBell } from '@/components/NotificationBell'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { EudaChatLogo } from '@/components/brand/EudaChatLogo'
 import { useAppData } from '@/lib/app-context'
 import { orderedPair, slugify } from '@/lib/chat-server'
@@ -320,8 +321,9 @@ export function AppChrome ({ channels, dmThreads, initialNotifications, children
             </div>
           </nav>
 
-          <div className="mt-3 border-t border-[var(--border)] pt-3">
+          <div className="mt-3 flex items-center justify-between gap-2 border-t border-[var(--border)] pt-3">
             <SignOutButton />
+            <ThemeToggle />
           </div>
         </aside>
 
@@ -332,11 +334,13 @@ export function AppChrome ({ channels, dmThreads, initialNotifications, children
               <span className="font-display text-base font-bold"><span className="text-gradient">EudaChat</span></span>
             </Link>
             <div className="flex items-center gap-2">
+              <ThemeToggle />
               <Link href="/app/search" className={ui.btnGhost}>Search</Link>
               <NotificationBell userId={currentUser.id} initialNotifications={initialNotifications} />
             </div>
           </header>
           <div className="hidden items-center justify-end gap-2 border-b border-[var(--border)] px-4 py-2 sm:flex">
+            <ThemeToggle />
             <NotificationBell userId={currentUser.id} initialNotifications={initialNotifications} />
           </div>
           <main className="min-h-0 flex-1">{children}</main>
