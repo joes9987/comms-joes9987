@@ -1,4 +1,4 @@
-/** Shared Tailwind class strings for the EudaChat theme (warm ivory + deep teal/ink). */
+/** Shared Tailwind class strings for the EudaChat theme (EudaPM cyan/indigo). */
 
 export const ui = {
   meshBg: 'mesh-background min-h-screen',
