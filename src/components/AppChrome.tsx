@@ -348,6 +348,9 @@ export function AppChrome ({ channels, dmThreads, initialNotifications, children
             <div className="flex items-center gap-2">
               <ThemeToggle />
               <Link href="/app/search" className={ui.btnGhost}>Search</Link>
+              {currentUser.isAdmin && (
+                <Link href="/app/staff" className={ui.btnGhost}>Staff</Link>
+              )}
               <NotificationBell userId={currentUser.id} initialNotifications={initialNotifications} />
             </div>
           </header>
