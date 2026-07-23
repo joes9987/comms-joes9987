@@ -1,22 +1,66 @@
--- EudaChat schema for Hult Cohort — cohort chat platform
--- Run in Supabase SQL editor or via `supabase db push`
+-- EudaChat on shared pm-joes9987 Supabase project (free-tier limit).
+-- Shares auth.users + profiles with EudaPM for exact email match.
+-- Uses chat_notifications (PM already owns public.notifications).
 
 create extension if not exists "pgcrypto";
 
--- ---------------------------------------------------------------------------
--- Tables
--- ---------------------------------------------------------------------------
+alter table public.profiles
+  add column if not exists handle text,
+  add column if not exists is_admin boolean not null default false;
 
-create table if not exists public.profiles (
-  id uuid primary key references auth.users (id) on delete cascade,
-  email text not null unique,
-  display_name text not null,
-  handle text not null unique,
-  is_admin boolean not null default false,
-  created_at timestamptz not null default now()
-);
+update public.profiles
+set handle = nullif(regexp_replace(lower(split_part(email, '@', 1)), '[^a-z0-9_]', '', 'g'), '')
+where handle is null or handle = '';
 
-create type public.channel_kind as enum ('public', 'announcements');
+update public.profiles
+set handle = 'member' || substr(replace(id::text, '-', ''), 1, 8)
+where handle is null or handle = '';
+
+do $$
+declare
+  r record;
+  suffix int;
+  candidate text;
+begin
+  for r in
+    select id, handle, created_at
+    from public.profiles
+    where handle in (select handle from public.profiles group by handle having count(*) > 1)
+    order by created_at
+  loop
+    suffix := 1;
+    loop
+      candidate := r.handle || suffix::text;
+      exit when not exists (
+        select 1 from public.profiles p where p.handle = candidate and p.id <> r.id
+      );
+      suffix := suffix + 1;
+    end loop;
+    -- keep the oldest row's handle; rename newer duplicates
+    if exists (
+      select 1 from public.profiles p
+      where p.handle = r.handle and p.id <> r.id and p.created_at < r.created_at
+    ) then
+      update public.profiles set handle = candidate where id = r.id;
+    end if;
+  end loop;
+end $$;
+
+alter table public.profiles alter column handle set not null;
+
+do $$
+begin
+  if not exists (select 1 from pg_constraint where conname = 'profiles_handle_key') then
+    alter table public.profiles add constraint profiles_handle_key unique (handle);
+  end if;
+end $$;
+
+do $$
+begin
+  if not exists (select 1 from pg_type where typname = 'channel_kind') then
+    create type public.channel_kind as enum ('public', 'announcements');
+  end if;
+end $$;
 
 create table if not exists public.channels (
   id uuid primary key default gen_random_uuid(),
@@ -61,7 +105,7 @@ create index if not exists messages_dm_thread_id_idx on public.messages (dm_thre
 create index if not exists messages_body_search_idx on public.messages
   using gin (to_tsvector('english', body));
 
-create table if not exists public.notifications (
+create table if not exists public.chat_notifications (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles (id) on delete cascade,
   type text not null check (type in ('dm', 'mention')),
@@ -71,34 +115,20 @@ create table if not exists public.notifications (
   created_at timestamptz not null default now()
 );
 
-create index if not exists notifications_user_id_idx on public.notifications (user_id, created_at desc);
-create index if not exists notifications_unread_idx on public.notifications (user_id)
+create index if not exists chat_notifications_user_id_idx on public.chat_notifications (user_id, created_at desc);
+create index if not exists chat_notifications_unread_idx on public.chat_notifications (user_id)
   where read_at is null;
 
--- ---------------------------------------------------------------------------
--- Row Level Security
--- ---------------------------------------------------------------------------
-
-alter table public.profiles enable row level security;
 alter table public.channels enable row level security;
 alter table public.dm_threads enable row level security;
 alter table public.messages enable row level security;
-alter table public.notifications enable row level security;
+alter table public.chat_notifications enable row level security;
 
-create policy "profiles_select_all" on public.profiles
-  for select to authenticated using (true);
-
-create policy "profiles_insert_own" on public.profiles
-  for insert to authenticated with check (auth.uid() = id);
-
-create policy "profiles_update_own" on public.profiles
-  for update to authenticated
-  using (auth.uid() = id)
-  with check (auth.uid() = id);
-
+drop policy if exists "channels_select_all" on public.channels;
 create policy "channels_select_all" on public.channels
   for select to authenticated using (true);
 
+drop policy if exists "channels_insert" on public.channels;
 create policy "channels_insert" on public.channels
   for insert to authenticated
   with check (
@@ -109,8 +139,7 @@ create policy "channels_insert" on public.channels
     )
   );
 
--- Any authenticated member can rename/archive public channels.
--- Announcements channel metadata stays admin-only.
+drop policy if exists "channels_update" on public.channels;
 create policy "channels_update" on public.channels
   for update to authenticated
   using (
@@ -122,12 +151,15 @@ create policy "channels_update" on public.channels
     or exists (select 1 from public.profiles p where p.id = auth.uid() and p.is_admin)
   );
 
+drop policy if exists "dm_threads_select_own" on public.dm_threads;
 create policy "dm_threads_select_own" on public.dm_threads
   for select to authenticated using (auth.uid() in (user_a, user_b));
 
+drop policy if exists "dm_threads_insert_own" on public.dm_threads;
 create policy "dm_threads_insert_own" on public.dm_threads
   for insert to authenticated with check (auth.uid() in (user_a, user_b));
 
+drop policy if exists "messages_select" on public.messages;
 create policy "messages_select" on public.messages
   for select to authenticated
   using (
@@ -141,6 +173,7 @@ create policy "messages_select" on public.messages
     )
   );
 
+drop policy if exists "messages_insert" on public.messages;
 create policy "messages_insert" on public.messages
   for insert to authenticated
   with check (
@@ -168,20 +201,19 @@ create policy "messages_insert" on public.messages
     )
   );
 
-create policy "notifications_select_own" on public.notifications
+drop policy if exists "chat_notifications_select_own" on public.chat_notifications;
+create policy "chat_notifications_select_own" on public.chat_notifications
   for select to authenticated using (auth.uid() = user_id);
 
-create policy "notifications_update_own" on public.notifications
+drop policy if exists "chat_notifications_update_own" on public.chat_notifications;
+create policy "chat_notifications_update_own" on public.chat_notifications
   for update to authenticated
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
 
-create policy "notifications_insert_own" on public.notifications
+drop policy if exists "chat_notifications_insert_own" on public.chat_notifications;
+create policy "chat_notifications_insert_own" on public.chat_notifications
   for insert to authenticated with check (auth.uid() = user_id);
-
--- ---------------------------------------------------------------------------
--- Trigger: new auth user -> profile row (handle derived + de-duplicated)
--- ---------------------------------------------------------------------------
 
 create or replace function public.handle_new_user()
 returns trigger
@@ -211,19 +243,15 @@ begin
     new.email,
     coalesce(new.raw_user_meta_data ->> 'display_name', split_part(new.email, '@', 1)),
     final_handle
-  );
+  )
+  on conflict (id) do update
+    set email = excluded.email,
+        display_name = coalesce(public.profiles.display_name, excluded.display_name),
+        handle = coalesce(public.profiles.handle, excluded.handle);
+
   return new;
 end;
 $$;
-
-drop trigger if exists on_auth_user_created on auth.users;
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute function public.handle_new_user();
-
--- ---------------------------------------------------------------------------
--- Trigger: new DM message -> notify the other participant
--- ---------------------------------------------------------------------------
 
 create or replace function public.notify_dm_message()
 returns trigger
@@ -241,7 +269,7 @@ begin
     where t.id = new.dm_thread_id;
 
     if recipient is not null and recipient <> new.author_id then
-      insert into public.notifications (user_id, type, message_id, body)
+      insert into public.chat_notifications (user_id, type, message_id, body)
       values (recipient, 'dm', new.id, left(new.body, 160));
     end if;
   end if;
@@ -253,10 +281,6 @@ drop trigger if exists on_message_notify_dm on public.messages;
 create trigger on_message_notify_dm
   after insert on public.messages
   for each row execute function public.notify_dm_message();
-
--- ---------------------------------------------------------------------------
--- Trigger: new message -> notify @handle mentions (channel or DM)
--- ---------------------------------------------------------------------------
 
 create or replace function public.notify_message_mentions()
 returns trigger
@@ -277,7 +301,7 @@ begin
     where handle = mention_handle and id <> new.author_id;
 
     if mentioned_id is not null then
-      insert into public.notifications (user_id, type, message_id, body)
+      insert into public.chat_notifications (user_id, type, message_id, body)
       values (mentioned_id, 'mention', new.id, left(new.body, 160));
     end if;
   end loop;
@@ -290,10 +314,6 @@ create trigger on_message_notify_mentions
   after insert on public.messages
   for each row execute function public.notify_message_mentions();
 
--- ---------------------------------------------------------------------------
--- Realtime
--- ---------------------------------------------------------------------------
-
 do $$
 begin
   if exists (select 1 from pg_publication where pubname = 'supabase_realtime') then
@@ -305,22 +325,12 @@ begin
     end if;
     if not exists (
       select 1 from pg_publication_tables
-      where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'notifications'
+      where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'chat_notifications'
     ) then
-      alter publication supabase_realtime add table public.notifications;
-    end if;
-    if not exists (
-      select 1 from pg_publication_tables
-      where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'channels'
-    ) then
-      alter publication supabase_realtime add table public.channels;
+      alter publication supabase_realtime add table public.chat_notifications;
     end if;
   end if;
 end $$;
-
--- ---------------------------------------------------------------------------
--- Seed channels
--- ---------------------------------------------------------------------------
 
 insert into public.channels (name, slug, kind)
 values

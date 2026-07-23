@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
@@ -28,7 +28,7 @@ export function NotificationBell ({ userId, initialNotifications }: Notification
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'notifications',
+          table: 'chat_notifications',
           filter: `user_id=eq.${userId}`
         },
         (payload) => {
@@ -64,7 +64,7 @@ export function NotificationBell ({ userId, initialNotifications }: Notification
     const readAt = new Date().toISOString()
     const supabase = createClient()
     const { error } = await supabase
-      .from('notifications')
+      .from('chat_notifications')
       .update({ read_at: readAt })
       .eq('id', notificationId)
       .eq('user_id', userId)
@@ -80,7 +80,7 @@ export function NotificationBell ({ userId, initialNotifications }: Notification
     const readAt = new Date().toISOString()
     const supabase = createClient()
     const { error } = await supabase
-      .from('notifications')
+      .from('chat_notifications')
       .update({ read_at: readAt })
       .eq('user_id', userId)
       .is('read_at', null)

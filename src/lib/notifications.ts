@@ -1,4 +1,4 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
+﻿import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Message, Notification, Profile } from '@/lib/types'
 
 type CurrentUserLite = {
@@ -24,7 +24,7 @@ export async function createNotificationsForMessage (input: {
   }> = []
 
   if (isDm && message.dm_thread_id) {
-    // Notify the peer (not the author) — resolved by caller via profiles if needed.
+    // Notify the peer (not the author) â€” resolved by caller via profiles if needed.
     // For DMs we notify whoever is not the author among thread members via a follow-up query.
     const { data: thread } = await supabase
       .from('dm_threads')
@@ -55,7 +55,7 @@ export async function createNotificationsForMessage (input: {
   }
 
   if (rows.length === 0) return
-  await supabase.from('notifications').insert(rows)
+  await supabase.from('chat_notifications').insert(rows)
 }
 
 type NotificationRow = Notification & {
@@ -88,7 +88,7 @@ export async function fetchUserNotifications (
   limit = 20
 ): Promise<NotificationWithLink[]> {
   const { data } = await supabase
-    .from('notifications')
+    .from('chat_notifications')
     .select(NOTIFICATION_SELECT)
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
@@ -102,7 +102,7 @@ export async function fetchNotificationById (
   notificationId: string
 ): Promise<NotificationWithLink | null> {
   const { data } = await supabase
-    .from('notifications')
+    .from('chat_notifications')
     .select(NOTIFICATION_SELECT)
     .eq('id', notificationId)
     .maybeSingle()
