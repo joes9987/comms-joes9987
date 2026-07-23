@@ -8,7 +8,7 @@ updates.
 
 ## Production URL
 
-https://comms-joes9987.vercel.app <!-- TODO: update after first Vercel deploy -->
+https://comms-joes9987.vercel.app
 
 ## Stack
 
@@ -37,7 +37,7 @@ Browser (React)
 | `channels` | Named rooms; `kind` is `public` or `announcements`; `archived_at` soft-archive |
 | `dm_threads` | One row per unique unordered pair of profiles (`user_a < user_b`, unique) |
 | `messages` | Belongs to exactly one of `channel_id` / `dm_thread_id` (checked in SQL) |
-| `notifications` | In-app alerts for DMs and `@mentions`, written only by DB triggers |
+| `chat_notifications` | In-app alerts for DMs and `@mentions` (PM already owns `notifications`) |
 
 RLS highlights:
 
