@@ -5,6 +5,7 @@ export type Profile = {
   handle: string
   is_admin: boolean
   avatar_url?: string | null
+  banner_url?: string | null
   bio?: string | null
   date_of_birth?: string | null
   created_at?: string

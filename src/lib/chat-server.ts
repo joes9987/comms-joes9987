@@ -4,7 +4,7 @@ import type { Channel, DmThread, Message, Profile } from '@/lib/types'
 export async function getProfiles (supabase: SupabaseClient): Promise<Profile[]> {
   const { data } = await supabase
     .from('profiles')
-    .select('id, email, display_name, handle, is_admin, avatar_url, bio, created_at')
+    .select('id, email, display_name, handle, is_admin, avatar_url, banner_url, bio, created_at')
     .order('display_name')
   return (data ?? []) as Profile[]
 }

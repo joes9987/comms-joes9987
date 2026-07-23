@@ -2,7 +2,9 @@
 
 import { useRouter } from 'next/navigation'
 import { useRef, useState } from 'react'
+import { AppearanceSettings } from '@/components/AppearanceSettings'
 import { Avatar } from '@/components/Avatar'
+import { ProfileCard } from '@/components/ProfileCard'
 import { createClient } from '@/lib/supabase/client'
 import { ui } from '@/lib/ui'
 import type { Profile } from '@/lib/types'
@@ -14,53 +16,67 @@ type ProfileEditorProps = {
   profile: Profile
 }
 
+async function uploadImage (userId: string, file: File, basename: string) {
+  if (!file.type.startsWith('image/')) {
+    return { error: 'Please choose an image file (JPEG, PNG, WebP, or GIF).' }
+  }
+  if (file.size > MAX_BYTES) {
+    return { error: 'Image must be 2 MB or smaller.' }
+  }
+
+  const supabase = createClient()
+  const ext = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg'
+  const path = `${userId}/${basename}.${ext}`
+
+  const { error: uploadError } = await supabase.storage
+    .from('avatars')
+    .upload(path, file, { upsert: true, contentType: file.type, cacheControl: '3600' })
+
+  if (uploadError) return { error: uploadError.message }
+
+  const { data } = supabase.storage.from('avatars').getPublicUrl(path)
+  return { url: `${data.publicUrl}?v=${Date.now()}` }
+}
+
 export function ProfileEditor ({ profile }: ProfileEditorProps) {
   const router = useRouter()
-  const fileRef = useRef<HTMLInputElement>(null)
+  const avatarRef = useRef<HTMLInputElement>(null)
+  const bannerRef = useRef<HTMLInputElement>(null)
   const [displayName, setDisplayName] = useState(profile.display_name)
   const [handle, setHandle] = useState(profile.handle)
   const [bio, setBio] = useState(profile.bio ?? '')
   const [dob, setDob] = useState(profile.date_of_birth ?? '')
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url ?? null)
+  const [bannerUrl, setBannerUrl] = useState(profile.banner_url ?? null)
   const [loading, setLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
-  async function uploadAvatar (file: File) {
-    if (!file.type.startsWith('image/')) {
-      setError('Please choose an image file (JPEG, PNG, WebP, or GIF).')
-      return
-    }
-    if (file.size > MAX_BYTES) {
-      setError('Image must be 2 MB or smaller.')
-      return
-    }
+  const previewProfile: Profile = {
+    ...profile,
+    display_name: displayName,
+    handle,
+    bio: bio.trim() || null,
+    avatar_url: avatarUrl,
+    banner_url: bannerUrl
+  }
 
+  async function uploadAvatar (file: File) {
     setUploading(true)
     setError(null)
     setSuccess(null)
-
-    const supabase = createClient()
-    const ext = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg'
-    const path = `${profile.id}/avatar.${ext}`
-
-    const { error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(path, file, { upsert: true, contentType: file.type, cacheControl: '3600' })
-
-    if (uploadError) {
+    const result = await uploadImage(profile.id, file, 'avatar')
+    if (result.error || !result.url) {
       setUploading(false)
-      setError(uploadError.message)
+      setError(result.error ?? 'Upload failed.')
       return
     }
 
-    const { data } = supabase.storage.from('avatars').getPublicUrl(path)
-    const publicUrl = `${data.publicUrl}?v=${Date.now()}`
-
+    const supabase = createClient()
     const { error: updateError } = await supabase
       .from('profiles')
-      .update({ avatar_url: publicUrl })
+      .update({ avatar_url: result.url })
       .eq('id', profile.id)
 
     setUploading(false)
@@ -68,8 +84,7 @@ export function ProfileEditor ({ profile }: ProfileEditorProps) {
       setError(updateError.message)
       return
     }
-
-    setAvatarUrl(publicUrl)
+    setAvatarUrl(result.url)
     setSuccess('Profile picture updated.')
     router.refresh()
   }
@@ -90,6 +105,52 @@ export function ProfileEditor ({ profile }: ProfileEditorProps) {
     }
     setAvatarUrl(null)
     setSuccess('Profile picture removed.')
+    router.refresh()
+  }
+
+  async function uploadBanner (file: File) {
+    setUploading(true)
+    setError(null)
+    setSuccess(null)
+    const result = await uploadImage(profile.id, file, 'banner')
+    if (result.error || !result.url) {
+      setUploading(false)
+      setError(result.error ?? 'Upload failed.')
+      return
+    }
+
+    const supabase = createClient()
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ banner_url: result.url })
+      .eq('id', profile.id)
+
+    setUploading(false)
+    if (updateError) {
+      setError(updateError.message)
+      return
+    }
+    setBannerUrl(result.url)
+    setSuccess('Banner updated.')
+    router.refresh()
+  }
+
+  async function removeBanner () {
+    if (!bannerUrl || uploading) return
+    setUploading(true)
+    setError(null)
+    const supabase = createClient()
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ banner_url: null })
+      .eq('id', profile.id)
+    setUploading(false)
+    if (updateError) {
+      setError(updateError.message)
+      return
+    }
+    setBannerUrl(null)
+    setSuccess('Banner removed.')
     router.refresh()
   }
 
@@ -149,23 +210,80 @@ export function ProfileEditor ({ profile }: ProfileEditorProps) {
         <p className={ui.eyebrow}>Profile</p>
         <h1 className="font-display mt-1 text-2xl font-semibold">Customize your profile</h1>
         <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-          Picture and display name show in chat. Bio is optional. Date of birth is optional and only visible to you.
+          Picture, banner, and display name show on your profile card in chat. Bio is optional.
+          Date of birth is optional and only visible to you.
         </p>
       </header>
+
+      <section className={`${ui.card} mb-4 overflow-hidden p-0`}>
+        <div className="border-b border-[var(--border)] px-6 py-4">
+          <p className={ui.sectionTitle}>Card preview</p>
+          <p className="mt-1 text-xs text-[var(--muted)]">What others see when they click your name</p>
+        </div>
+        <div className="bg-[var(--background)]/40 p-4">
+          <div className="surface-elevated mx-auto max-w-xs overflow-hidden rounded-2xl">
+            <ProfileCard profile={previewProfile} />
+          </div>
+        </div>
+      </section>
+
+      <section className={`${ui.card} mb-4`}>
+        <p className={ui.sectionTitle}>Banner</p>
+        <p className="mt-1 text-xs text-[var(--muted)]">Wide image (~3:1). Shown at the top of your profile card.</p>
+        <div className="mt-4 overflow-hidden rounded-xl border border-[var(--border)]">
+          <div
+            className="h-20 w-full bg-[linear-gradient(135deg,var(--primary),var(--accent))]"
+            style={
+              bannerUrl
+                ? { backgroundImage: `url(${bannerUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+                : undefined
+            }
+            aria-hidden="true"
+          />
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            className={ui.btnSecondary}
+            disabled={uploading}
+            onClick={() => bannerRef.current?.click()}
+          >
+            {uploading ? 'Uploading…' : 'Upload banner'}
+          </button>
+          {bannerUrl && (
+            <button
+              type="button"
+              className={ui.btnGhost}
+              disabled={uploading}
+              onClick={() => void removeBanner()}
+            >
+              Remove
+            </button>
+          )}
+        </div>
+        <input
+          ref={bannerRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0]
+            if (file) void uploadBanner(file)
+            e.target.value = ''
+          }}
+        />
+      </section>
 
       <section className={`${ui.card} mb-4`}>
         <p className={ui.sectionTitle}>Profile picture</p>
         <div className="mt-4 flex items-center gap-4">
-          <Avatar
-            profile={{ ...profile, avatar_url: avatarUrl, display_name: displayName }}
-            size="lg"
-          />
+          <Avatar profile={previewProfile} size="lg" />
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
               className={ui.btnSecondary}
               disabled={uploading}
-              onClick={() => fileRef.current?.click()}
+              onClick={() => avatarRef.current?.click()}
             >
               {uploading ? 'Uploading…' : 'Upload photo'}
             </button>
@@ -181,7 +299,7 @@ export function ProfileEditor ({ profile }: ProfileEditorProps) {
             )}
           </div>
           <input
-            ref={fileRef}
+            ref={avatarRef}
             type="file"
             accept="image/jpeg,image/png,image/webp,image/gif"
             className="hidden"
@@ -251,6 +369,8 @@ export function ProfileEditor ({ profile }: ProfileEditorProps) {
           {loading ? 'Saving…' : 'Save profile'}
         </button>
       </form>
+
+      <AppearanceSettings />
 
       {success && <p className={`mt-4 ${ui.alertSuccess}`} role="status">{success}</p>}
       {error && <p className={`mt-4 ${ui.alertError}`} role="alert">{error}</p>}

@@ -4,14 +4,15 @@ type AvatarProps = {
   profile?: Profile | null
   name?: string
   src?: string | null
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'sm' | 'md' | 'lg' | 'xl'
   className?: string
 }
 
 const SIZE = {
   sm: 'h-7 w-7 text-[10px]',
   md: 'h-9 w-9 text-xs',
-  lg: 'h-16 w-16 text-lg'
+  lg: 'h-16 w-16 text-lg',
+  xl: 'h-20 w-20 text-xl ring-4 ring-[var(--card-solid)]'
 } as const
 
 export function Avatar ({ profile, name, src, size = 'md', className = '' }: AvatarProps) {

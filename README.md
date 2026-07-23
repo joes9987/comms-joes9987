@@ -33,9 +33,9 @@ Browser (React)
 
 | Table | Purpose |
 |-------|---------|
-| `profiles` | Cohort member email, display name, `handle`, `avatar_url`, `bio`, `is_admin` |
+| `profiles` | Cohort member email, display name, `handle`, `avatar_url`, `banner_url`, `bio`, `is_admin` |
 | `profile_private` | Per-user private fields (e.g. date of birth) — RLS: owner only |
-| Storage `avatars` | Public bucket for profile pictures (2 MB, image MIME types) |
+| Storage `avatars` | Public bucket for profile pictures, banners, and personal wallpapers (2 MB, image MIME types) |
 | `channels` | Named rooms; `kind` is `public` or `announcements`; `archived_at` soft-archive |
 | `dm_threads` | One row per unique unordered pair of profiles (`user_a < user_b`, unique) |
 | `messages` | Belongs to exactly one of `channel_id` / `dm_thread_id` (checked in SQL) |
@@ -105,7 +105,9 @@ npm run dev
 - [x] In-app notifications for new DMs and `@handle` mentions, with mark-read and deep links
 - [x] `@handle` mention autocomplete in the composer
 - [x] Middleware-enforced auth gate on `/app/*`
-- [x] Profile customization (`/app/profile`) — photo, display name, handle, bio; optional private DOB
+- [x] Profile customization (`/app/profile`) — photo, banner, display name, handle, bio; optional private DOB
+- [x] Discord-style profile popover from chat names, avatars, and `@mentions`
+- [x] Personal app background presets + custom wallpaper (local to this browser)
 
 ## Known limitations
 

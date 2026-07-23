@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import { Avatar } from '@/components/Avatar'
 import { NotificationBell } from '@/components/NotificationBell'
+import { ProfileTrigger } from '@/components/ProfilePopover'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { EudaChatLogo } from '@/components/brand/EudaChatLogo'
 import { useAppData } from '@/lib/app-context'
@@ -13,6 +14,7 @@ import type { NotificationWithLink } from '@/lib/notifications'
 import { createClient } from '@/lib/supabase/client'
 import { profileLabel, type Channel, type DmThread } from '@/lib/types'
 import { ui } from '@/lib/ui'
+import { readWallpaperPrefs, type WallpaperPrefs } from '@/lib/wallpaper'
 
 type AppChromeProps = {
   channels: Channel[]
@@ -248,25 +250,67 @@ function DmRow ({ thread }: { thread: DmThread }) {
   const active = pathname === `/app/dm/${thread.id}`
 
   return (
-    <li>
-      <Link href={`/app/dm/${thread.id}`} className={`${ui.navLink} ${active ? ui.navLinkActive : ''}`}>
+    <li className={`flex items-center gap-0.5 rounded-lg ${active ? ui.navLinkActive : ''}`}>
+      <ProfileTrigger profile={peer} className="shrink-0 px-1 py-1.5">
         <Avatar profile={peer} size="sm" />
+      </ProfileTrigger>
+      <Link href={`/app/dm/${thread.id}`} className={`${ui.navLink} min-w-0 flex-1 ${active ? '' : ''}`}>
         <span className="truncate">{profileLabel(peer)}</span>
       </Link>
     </li>
   )
 }
 
+function useWallpaperPrefs (): WallpaperPrefs {
+  const [prefs, setPrefs] = useState<WallpaperPrefs>({ mode: 'mesh' })
+
+  useEffect(() => {
+    setPrefs(readWallpaperPrefs())
+    function onChange (event: Event) {
+      const detail = (event as CustomEvent<WallpaperPrefs>).detail
+      if (detail) setPrefs(detail)
+      else setPrefs(readWallpaperPrefs())
+    }
+    window.addEventListener('eudachat:wallpaper', onChange)
+    window.addEventListener('storage', onChange)
+    return () => {
+      window.removeEventListener('eudachat:wallpaper', onChange)
+      window.removeEventListener('storage', onChange)
+    }
+  }, [])
+
+  return prefs
+}
+
 export function AppChrome ({ channels, dmThreads, initialNotifications, children }: AppChromeProps) {
-  const { currentUser } = useAppData()
+  const { currentUser, profileMap } = useAppData()
   const [showArchived, setShowArchived] = useState(false)
+  const wallpaper = useWallpaperPrefs()
+  const selfProfile = profileMap[currentUser.id] ?? {
+    id: currentUser.id,
+    email: currentUser.email,
+    display_name: currentUser.displayName,
+    handle: currentUser.handle,
+    is_admin: currentUser.isAdmin,
+    avatar_url: currentUser.avatarUrl,
+    bio: currentUser.bio
+  }
 
   const visibleChannels = channels.filter((c) => showArchived || !c.archived_at)
   const announcementsChannels = visibleChannels.filter((c) => c.kind === 'announcements')
   const publicChannels = visibleChannels.filter((c) => c.kind !== 'announcements')
 
+  const wallpaperStyle: CSSProperties | undefined =
+    wallpaper.mode === 'custom' && wallpaper.url
+      ? ({ ['--wallpaper-image']: `url(${wallpaper.url})` } as CSSProperties)
+      : undefined
+
   return (
-    <div className={ui.meshBg}>
+    <div
+      className={ui.meshBg}
+      data-wallpaper={wallpaper.mode}
+      style={wallpaperStyle}
+    >
       <div className="mx-auto flex h-screen max-w-6xl">
         <aside className="hidden w-64 shrink-0 flex-col border-r border-[var(--border)] px-3 py-4 sm:flex">
           <Link href="/app" className="mb-4 flex items-center gap-2 px-1">
@@ -276,27 +320,31 @@ export function AppChrome ({ channels, dmThreads, initialNotifications, children
             </span>
           </Link>
 
-          <Link href="/app/profile" className="mb-3 flex items-center gap-2.5 rounded-xl px-1 py-1.5 transition hover:bg-[var(--nav-active)]">
-            <Avatar
-              src={currentUser.avatarUrl}
-              name={currentUser.displayName}
-              size="md"
-            />
-            <div className="min-w-0 text-xs text-[var(--muted)]">
-              <p className="truncate font-medium text-[var(--foreground)]">
-                {currentUser.displayName}
-                {currentUser.isAdmin && (
-                  <span className="ml-2 rounded-full bg-[var(--accent-soft)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--accent-foreground)]">
-                    staff
-                  </span>
+          <div className="mb-3 flex items-center gap-2.5 rounded-xl px-1 py-1.5">
+            <ProfileTrigger profile={selfProfile} className="shrink-0">
+              <Avatar
+                src={currentUser.avatarUrl}
+                name={currentUser.displayName}
+                size="md"
+              />
+            </ProfileTrigger>
+            <Link href="/app/profile" className="min-w-0 flex-1 rounded-lg py-0.5 transition hover:bg-[var(--nav-active)]">
+              <div className="min-w-0 text-xs text-[var(--muted)]">
+                <p className="truncate font-medium text-[var(--foreground)]">
+                  {currentUser.displayName}
+                  {currentUser.isAdmin && (
+                    <span className="ml-2 rounded-full bg-[var(--accent-soft)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--accent-foreground)]">
+                      staff
+                    </span>
+                  )}
+                </p>
+                <p className="truncate font-mono">@{currentUser.handle}</p>
+                {currentUser.bio && (
+                  <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug">{currentUser.bio}</p>
                 )}
-              </p>
-              <p className="truncate font-mono">@{currentUser.handle}</p>
-              {currentUser.bio && (
-                <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug">{currentUser.bio}</p>
-              )}
-            </div>
-          </Link>
+              </div>
+            </Link>
+          </div>
 
           <nav className="flex-1 space-y-4 overflow-y-auto">
             <div>

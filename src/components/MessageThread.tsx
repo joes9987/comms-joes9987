@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Avatar } from '@/components/Avatar'
 import { MessageComposer, useMessageSender } from '@/components/MessageComposer'
+import { MentionChip, ProfileTrigger } from '@/components/ProfilePopover'
 import { useAppData } from '@/lib/app-context'
 import { splitMentions } from '@/lib/mentions'
 import { createClient } from '@/lib/supabase/client'
@@ -75,18 +76,23 @@ export function MessageThread ({ target, initialMessages }: MessageThreadProps) 
             const isSelf = message.author_id === currentUser.id
             return (
               <li key={message.id} className="flex gap-3">
-                <Avatar profile={author} className="mt-0.5" />
+                <ProfileTrigger profile={author} className="mt-0.5 shrink-0">
+                  <Avatar profile={author} />
+                </ProfileTrigger>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-sm font-semibold text-[var(--foreground)]">
+                    <ProfileTrigger
+                      profile={author}
+                      className="text-sm font-semibold text-[var(--foreground)] hover:underline"
+                    >
                       {isSelf ? 'You' : profileLabel(author)}
-                    </span>
+                    </ProfileTrigger>
                     <time className="font-mono text-xs text-[var(--muted)]">{formatTimestamp(message.created_at)}</time>
                   </div>
                   <p className="mt-0.5 whitespace-pre-wrap break-words text-sm text-[var(--card-foreground)]">
                     {splitMentions(message.body).map((segment, i) =>
                       segment.mention ? (
-                        <span key={i} className="mention-chip">{segment.text}</span>
+                        <MentionChip key={i} text={segment.text} />
                       ) : (
                         <span key={i}>{segment.text}</span>
                       )
