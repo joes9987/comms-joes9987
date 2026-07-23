@@ -33,7 +33,9 @@ Browser (React)
 
 | Table | Purpose |
 |-------|---------|
-| `profiles` | Cohort member email, display name, `handle` (for `@mentions`), `is_admin` |
+| `profiles` | Cohort member email, display name, `handle`, `avatar_url`, `bio`, `is_admin` |
+| `profile_private` | Per-user private fields (e.g. date of birth) — RLS: owner only |
+| Storage `avatars` | Public bucket for profile pictures (2 MB, image MIME types) |
 | `channels` | Named rooms; `kind` is `public` or `announcements`; `archived_at` soft-archive |
 | `dm_threads` | One row per unique unordered pair of profiles (`user_a < user_b`, unique) |
 | `messages` | Belongs to exactly one of `channel_id` / `dm_thread_id` (checked in SQL) |
@@ -103,11 +105,10 @@ npm run dev
 - [x] In-app notifications for new DMs and `@handle` mentions, with mark-read and deep links
 - [x] `@handle` mention autocomplete in the composer
 - [x] Middleware-enforced auth gate on `/app/*`
+- [x] Profile customization (`/app/profile`) — photo, display name, handle, bio; optional private DOB
 
 ## Known limitations
 
-- `handle` (used for `@mentions`) is derived automatically from the email local-part at signup and
-  is not currently user-editable from the UI (would need a `/settings` page).
 - The channel/DM sidebar refreshes via Next.js server-component refresh after you create,
   rename, or archive something (or open a new DM) — it does not (yet) live-update if a
   *different* browser session creates a channel while you're looking at the sidebar. Message

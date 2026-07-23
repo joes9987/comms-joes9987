@@ -9,6 +9,8 @@ type CurrentUser = {
   displayName: string
   handle: string
   isAdmin: boolean
+  avatarUrl: string | null
+  bio: string | null
 }
 
 type AppData = {

@@ -4,6 +4,9 @@ export type Profile = {
   display_name: string
   handle: string
   is_admin: boolean
+  avatar_url?: string | null
+  bio?: string | null
+  date_of_birth?: string | null
   created_at?: string
 }
 
@@ -50,4 +53,13 @@ export type Notification = {
 export function profileLabel (profile: Profile | undefined | null, fallback = 'Unknown'): string {
   if (!profile) return fallback
   return profile.display_name || profile.handle || fallback
+}
+
+export function profileInitials (profile: Profile | undefined | null): string {
+  const label = profileLabel(profile, '?')
+  const parts = label.trim().split(/\s+/).filter(Boolean)
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase()
+  }
+  return label.slice(0, 2).toUpperCase()
 }

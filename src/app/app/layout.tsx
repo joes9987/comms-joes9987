@@ -43,7 +43,9 @@ export default async function AppLayout ({ children }: { children: React.ReactNo
     email: user.email ?? '',
     displayName: profile?.display_name ?? user.email?.split('@')[0] ?? 'You',
     handle: profile?.handle ?? 'you',
-    isAdmin: profile?.is_admin ?? false
+    isAdmin: profile?.is_admin ?? false,
+    avatarUrl: profile?.avatar_url ?? null,
+    bio: profile?.bio ?? null
   }
 
   return (

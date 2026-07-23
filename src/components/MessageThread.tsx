@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { Avatar } from '@/components/Avatar'
 import { MessageComposer, useMessageSender } from '@/components/MessageComposer'
 import { useAppData } from '@/lib/app-context'
 import { splitMentions } from '@/lib/mentions'
@@ -74,13 +75,7 @@ export function MessageThread ({ target, initialMessages }: MessageThreadProps) 
             const isSelf = message.author_id === currentUser.id
             return (
               <li key={message.id} className="flex gap-3">
-                <div
-                  className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold"
-                  style={{ background: 'var(--nav-active)', color: 'var(--nav-active-fg)' }}
-                  aria-hidden="true"
-                >
-                  {profileLabel(author, '?').slice(0, 2).toUpperCase()}
-                </div>
+                <Avatar profile={author} className="mt-0.5" />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline gap-2">
                     <span className="text-sm font-semibold text-[var(--foreground)]">

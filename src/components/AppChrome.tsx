@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { Avatar } from '@/components/Avatar'
 import { NotificationBell } from '@/components/NotificationBell'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { EudaChatLogo } from '@/components/brand/EudaChatLogo'
@@ -249,12 +250,7 @@ function DmRow ({ thread }: { thread: DmThread }) {
   return (
     <li>
       <Link href={`/app/dm/${thread.id}`} className={`${ui.navLink} ${active ? ui.navLinkActive : ''}`}>
-        <span
-          className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold"
-          style={{ background: 'var(--nav-active)', color: 'var(--nav-active-fg)' }}
-        >
-          {profileLabel(peer, '?').slice(0, 1).toUpperCase()}
-        </span>
+        <Avatar profile={peer} size="sm" />
         <span className="truncate">{profileLabel(peer)}</span>
       </Link>
     </li>
@@ -280,17 +276,27 @@ export function AppChrome ({ channels, dmThreads, initialNotifications, children
             </span>
           </Link>
 
-          <div className="min-w-0 px-1 pb-3 text-xs text-[var(--muted)]">
-            <p className="truncate font-medium text-[var(--foreground)]">
-              {currentUser.displayName}
-              {currentUser.isAdmin && (
-                <span className="ml-2 rounded-full bg-[var(--accent-soft)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--accent-foreground)]">
-                  staff
-                </span>
+          <Link href="/app/profile" className="mb-3 flex items-center gap-2.5 rounded-xl px-1 py-1.5 transition hover:bg-[var(--nav-active)]">
+            <Avatar
+              src={currentUser.avatarUrl}
+              name={currentUser.displayName}
+              size="md"
+            />
+            <div className="min-w-0 text-xs text-[var(--muted)]">
+              <p className="truncate font-medium text-[var(--foreground)]">
+                {currentUser.displayName}
+                {currentUser.isAdmin && (
+                  <span className="ml-2 rounded-full bg-[var(--accent-soft)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--accent-foreground)]">
+                    staff
+                  </span>
+                )}
+              </p>
+              <p className="truncate font-mono">@{currentUser.handle}</p>
+              {currentUser.bio && (
+                <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug">{currentUser.bio}</p>
               )}
-            </p>
-            <p className="truncate font-mono">@{currentUser.handle}</p>
-          </div>
+            </div>
+          </Link>
 
           <nav className="flex-1 space-y-4 overflow-y-auto">
             <div>
@@ -325,6 +331,7 @@ export function AppChrome ({ channels, dmThreads, initialNotifications, children
 
             <div className="space-y-0.5">
               <Link href="/app/search" className={ui.navLink}>Search</Link>
+              <Link href="/app/profile" className={ui.navLink}>Edit profile</Link>
               {currentUser.isAdmin && (
                 <Link href="/app/staff" className={ui.navLink}>
                   Manage staff
@@ -348,6 +355,7 @@ export function AppChrome ({ channels, dmThreads, initialNotifications, children
             <div className="flex items-center gap-2">
               <ThemeToggle />
               <Link href="/app/search" className={ui.btnGhost}>Search</Link>
+              <Link href="/app/profile" className={ui.btnGhost}>Profile</Link>
               {currentUser.isAdmin && (
                 <Link href="/app/staff" className={ui.btnGhost}>Staff</Link>
               )}
