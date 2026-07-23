@@ -84,13 +84,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 npm run dev
 ```
 
-7. Sign up, land in `#general`, try posting `@yourhandle hello` in another account's DM to see the
-   mention notification. To make an account an admin (able to post in **Announcements** and
-   manage any channel), run in the Supabase SQL editor:
-
-```sql
-update public.profiles set is_admin = true where email = 'you@example.com';
-```
+7. Sign up, land in `#general`. The first staff account (`singhjoe57@gmail.com`) is bootstrapped
+   by migration `002_staff_management.sql`. Other staff can be granted in-app at **Manage staff**
+   (`/app/staff`) by an existing admin.
 
 8. Build for production: `npm run build`
 
@@ -99,6 +95,7 @@ update public.profiles set is_admin = true where email = 'you@example.com';
 - [x] Email/password auth; `profiles` row auto-created on signup via trigger
 - [x] Channels: `general`, `random`, `help` seeded public; create, rename, archive/unarchive
 - [x] `announcements` channel: everyone can read, only `is_admin` accounts can post
+- [x] Staff management UI (`/app/staff`) — admins can grant/revoke staff for other members
 - [x] Direct messages: 1:1 thread between any two cohort members, deduplicated per pair
 - [x] All messages persisted in Postgres, scoped by Row Level Security
 - [x] Keyword search (`/app/search`) across every channel and your own DMs

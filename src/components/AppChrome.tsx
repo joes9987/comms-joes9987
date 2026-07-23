@@ -281,7 +281,14 @@ export function AppChrome ({ channels, dmThreads, initialNotifications, children
           </Link>
 
           <div className="min-w-0 px-1 pb-3 text-xs text-[var(--muted)]">
-            <p className="truncate font-medium text-[var(--foreground)]">{currentUser.displayName}</p>
+            <p className="truncate font-medium text-[var(--foreground)]">
+              {currentUser.displayName}
+              {currentUser.isAdmin && (
+                <span className="ml-2 rounded-full bg-[var(--accent-soft)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--accent-foreground)]">
+                  staff
+                </span>
+              )}
+            </p>
             <p className="truncate font-mono">@{currentUser.handle}</p>
           </div>
 
@@ -316,8 +323,13 @@ export function AppChrome ({ channels, dmThreads, initialNotifications, children
               </div>
             </div>
 
-            <div>
-              <Link href="/app/search" className={ui.navLink}>🔍 Search</Link>
+            <div className="space-y-0.5">
+              <Link href="/app/search" className={ui.navLink}>Search</Link>
+              {currentUser.isAdmin && (
+                <Link href="/app/staff" className={ui.navLink}>
+                  Manage staff
+                </Link>
+              )}
             </div>
           </nav>
 
