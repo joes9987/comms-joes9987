@@ -25,15 +25,15 @@ messages, an admin-only announcements channel, keyword search, and realtime upda
 
 ## Data model quick reference
 
-`profiles` (1:1 with `auth.users`, auto-created by trigger) → `channels` (public/announcements) →
-`messages` (belongs to exactly one of `channel_id` / `dm_thread_id`) → `notifications` (DM +
-`@mention` alerts, populated by DB triggers, never written directly by the client).
+`profiles` (1:1 with `auth.users`, auto-created by trigger; shared with EudaPM) → `channels`
+(public/announcements) → `messages` (exactly one of `channel_id` / `dm_thread_id`) →
+`chat_notifications` (DM + `@mention` alerts via security-definer triggers; **not** PM’s
+`notifications` table). Private DOB lives in `profile_private` (owner-only RLS).
 
-See [supabase/migrations/001_init.sql](supabase/migrations/001_init.sql) for the full schema, RLS
-policies, and triggers.
+See [supabase/migrations/](supabase/migrations/) for schema, RLS, and storage policies.
 
 ## Deploy
 
-Vercel project (not yet linked). Supabase env vars (`NEXT_PUBLIC_SUPABASE_URL`,
-`NEXT_PUBLIC_SUPABASE_ANON_KEY`) required in the Vercel dashboard for a live deploy; the build
-itself succeeds without them (see README "Known limitations").
+Production: https://comms-joes9987.vercel.app  
+Supabase env vars (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`) required in the
+Vercel dashboard; same project as EudaPM (`vidprovlxevofniwyhgs`).
