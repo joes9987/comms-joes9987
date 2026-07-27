@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useState, useSyncExternalStore, type CSSProperties } from 'react'
 import { Avatar } from '@/components/Avatar'
 import { NotificationBell } from '@/components/NotificationBell'
 import { ProfileTrigger } from '@/components/ProfilePopover'
@@ -261,25 +261,23 @@ function DmRow ({ thread }: { thread: DmThread }) {
   )
 }
 
+function subscribeWallpaper (onStoreChange: () => void) {
+  const onChange = () => onStoreChange()
+  window.addEventListener('eudachat:wallpaper', onChange)
+  window.addEventListener('storage', onChange)
+  return () => {
+    window.removeEventListener('eudachat:wallpaper', onChange)
+    window.removeEventListener('storage', onChange)
+  }
+}
+
 function useWallpaperPrefs (): WallpaperPrefs {
-  const [prefs, setPrefs] = useState<WallpaperPrefs>({ mode: 'mesh' })
-
-  useEffect(() => {
-    setPrefs(readWallpaperPrefs())
-    function onChange (event: Event) {
-      const detail = (event as CustomEvent<WallpaperPrefs>).detail
-      if (detail) setPrefs(detail)
-      else setPrefs(readWallpaperPrefs())
-    }
-    window.addEventListener('eudachat:wallpaper', onChange)
-    window.addEventListener('storage', onChange)
-    return () => {
-      window.removeEventListener('eudachat:wallpaper', onChange)
-      window.removeEventListener('storage', onChange)
-    }
-  }, [])
-
-  return prefs
+  const snapshot = useSyncExternalStore(
+    subscribeWallpaper,
+    () => JSON.stringify(readWallpaperPrefs()),
+    () => JSON.stringify({ mode: 'mesh' } satisfies WallpaperPrefs)
+  )
+  return JSON.parse(snapshot) as WallpaperPrefs
 }
 
 export function AppChrome ({ channels, dmThreads, initialNotifications, children }: AppChromeProps) {

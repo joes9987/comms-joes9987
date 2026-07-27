@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { ProfileCard } from '@/components/ProfileCard'
 import { useAppData } from '@/lib/app-context'
@@ -38,14 +38,10 @@ function ProfilePopoverPanel ({
   const { currentUser } = useAppData()
   const router = useRouter()
   const panelRef = useRef<HTMLDivElement>(null)
-  const [pos, setPos] = useState(() => positionFor(anchor))
+  const pos = useMemo(() => positionFor(anchor), [anchor])
   const [busy, setBusy] = useState(false)
   const isSelf = profile.id === currentUser.id
   const labelId = useId()
-
-  useLayoutEffect(() => {
-    setPos(positionFor(anchor))
-  }, [anchor])
 
   useEffect(() => {
     function onKey (e: KeyboardEvent) {

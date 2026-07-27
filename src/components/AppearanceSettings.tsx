@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useAppData } from '@/lib/app-context'
 import {
@@ -17,13 +17,11 @@ const MAX_BYTES = 2 * 1024 * 1024
 export function AppearanceSettings () {
   const { currentUser } = useAppData()
   const fileRef = useRef<HTMLInputElement>(null)
-  const [prefs, setPrefs] = useState<WallpaperPrefs>({ mode: 'mesh' })
+  const [prefs, setPrefs] = useState<WallpaperPrefs>(() => (
+    typeof window === 'undefined' ? { mode: 'mesh' } : readWallpaperPrefs()
+  ))
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    setPrefs(readWallpaperPrefs())
-  }, [])
 
   function apply (next: WallpaperPrefs) {
     setPrefs(next)
