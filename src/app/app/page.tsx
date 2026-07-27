@@ -8,6 +8,15 @@ export default async function AppIndexPage () {
   const supabase = await createClient()
   if (!supabase) redirect('/login')
 
+  const { data: general } = await supabase
+    .from('channels')
+    .select('slug')
+    .eq('slug', 'general')
+    .is('archived_at', null)
+    .maybeSingle()
+
+  if (general?.slug) redirect(`/app/c/${general.slug}`)
+
   const { data: firstChannel } = await supabase
     .from('channels')
     .select('slug')

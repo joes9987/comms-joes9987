@@ -47,8 +47,9 @@ RLS highlights:
 - Only admins (or the channel's own creator) can rename/archive a channel; only admins can post in
   an `announcements`-kind channel or create a new one of that kind.
 - DM threads and DM messages are only visible to their two participants.
-- Notifications are only ever visible to, and insertable/updatable by, the owning user; the DM and
-  `@mention` rows themselves are populated by `security definer` triggers, never by client code.
+- Notifications are only ever visible to / updatable by the owning user. DM and `@mention` rows are
+  inserted by `security definer` triggers (no client insert policy). Mention notifications on DMs
+  only fire for thread participants (no body-snippet leak to outsiders).
 
 ## Setup (fresh clone)
 
