@@ -32,6 +32,15 @@ messages, an admin-only announcements channel, keyword search, and realtime upda
 
 See [supabase/migrations/](supabase/migrations/) for schema, RLS, and storage policies.
 
+## Testing
+
+```bash
+npm test   # Vitest RLS suite — needs SUPABASE_SERVICE_ROLE_KEY in .env.local
+```
+
+Live cases create ephemeral `@eudachat-rls.test` users and delete them afterward. Without the
+service role key, those cases skip. CI: `.github/workflows/ci.yml`.
+
 ## Deploy
 
 Production: https://comms-joes9987.vercel.app  

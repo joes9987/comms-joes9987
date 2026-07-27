@@ -77,6 +77,7 @@ cp .env.example .env.local
 ```
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=   # local/CI RLS tests only — never commit or put in NEXT_PUBLIC_*
 ```
 
 5. In Supabase Auth settings, disable email confirmation for quick local testing (optional).
@@ -92,6 +93,14 @@ npm run dev
    (`/app/staff`) by an existing admin.
 
 8. Build for production: `npm run build`
+
+9. Optional — RLS security suite (creates ephemeral users, cleans them up):
+
+```bash
+npm test
+```
+
+Requires `SUPABASE_SERVICE_ROLE_KEY` in `.env.local`. Without it, live cases skip. GitHub Actions runs the same suite when repo secrets are set (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`).
 
 ## Features
 
@@ -109,6 +118,7 @@ npm run dev
 - [x] Profile customization (`/app/profile`) — photo, banner, display name, handle, bio; optional private DOB
 - [x] Discord-style profile popover from chat names, avatars, and `@mentions`
 - [x] Personal app background presets + custom wallpaper (local to this browser)
+- [x] Vitest RLS suite + GitHub Actions CI (DM isolation, mention privacy, staff escalation, channel update)
 
 ## Known limitations
 
