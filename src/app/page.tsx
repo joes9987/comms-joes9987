@@ -67,8 +67,16 @@ export default async function HomePage () {
         </div>
       </section>
 
-      <footer className="mx-auto w-full max-w-6xl px-4 py-6 text-center text-xs text-[var(--muted)]">
-        Built for the Hult Cohort Program.
+      <footer className="mx-auto flex w-full max-w-6xl flex-col items-center gap-2 px-4 py-6 text-center text-xs text-[var(--muted)]">
+        <p>Built for the Hult Cohort Program · Euda suite</p>
+        <p className="flex flex-wrap justify-center gap-3">
+          <a className="font-semibold text-[var(--primary)] underline-offset-2 hover:underline" href="https://pm-joes9987.vercel.app" target="_blank" rel="noreferrer">
+            EudaPM
+          </a>
+          <a className="font-semibold text-[var(--primary)] underline-offset-2 hover:underline" href="https://showcase-joes9987.vercel.app" target="_blank" rel="noreferrer">
+            EudaMarket
+          </a>
+        </p>
       </footer>
     </main>
   )
