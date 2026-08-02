@@ -44,6 +44,25 @@ export default async function HomePage () {
           <Link href="/signup" className={ui.btnPrimaryLg}>Create your account</Link>
           <Link href="/login" className={ui.btnSecondary}>I already have one</Link>
         </div>
+        <p className="animate-fade-up mt-5 max-w-xl text-sm text-[var(--muted-foreground)]">
+          Peer reviewer? Skip signup — use the shared demo at{' '}
+          <Link href="/login" className="font-semibold text-[var(--primary)] underline-offset-2 hover:underline">
+            Sign in
+          </Link>
+          : <span className="font-mono text-[var(--foreground)]">eudachat-reviewer@example.com</span>
+          {' / '}
+          <span className="font-mono text-[var(--foreground)]">EudaChat-Review-2026</span>
+          {' '}(seeded <span className="font-mono">#reviewer-demo</span> + DM). Details in{' '}
+          <a
+            className="font-semibold text-[var(--primary)] underline-offset-2 hover:underline"
+            href="https://github.com/joes9987/comms-joes9987/blob/main/docs/REVIEWER.md"
+            target="_blank"
+            rel="noreferrer"
+          >
+            docs/REVIEWER.md
+          </a>
+          .
+        </p>
 
         <div className="mt-16 grid w-full gap-4 sm:grid-cols-3">
           <div className={`${ui.cardSm} animate-fade-up text-left`}>

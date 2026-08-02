@@ -108,9 +108,12 @@ npm test
 
 Requires `SUPABASE_SERVICE_ROLE_KEY` in `.env.local`. Without it, live cases skip. GitHub Actions runs the same suite when repo secrets are set (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`).
 
+**Peer reviewers:** See [docs/REVIEWER.md](docs/REVIEWER.md) for the shared demo account (`eudachat-reviewer@example.com`) and smoke checklist. Refresh seed data with `npm run seed:reviewer` (service role required).
+
 ## Features
 
 - [x] Email/password auth; `profiles` row auto-created on signup via trigger
+- [x] Shared reviewer demo (`eudachat-reviewer@example.com`) with seeded `#reviewer-demo` + DM — see [docs/REVIEWER.md](docs/REVIEWER.md)
 - [x] Password reset (`/forgot-password` → email link → `/auth/callback` → `/auth/update-password`); shared suite account with EudaPM / EudaMarket
 - [x] Channels: `general`, `random`, `help` seeded public; create, rename, archive/unarchive
 - [x] `announcements` channel: everyone can read, only `is_admin` accounts can post

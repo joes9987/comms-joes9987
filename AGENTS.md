@@ -41,6 +41,15 @@ npm test   # Vitest RLS suite — needs SUPABASE_SERVICE_ROLE_KEY in .env.local
 Live cases create ephemeral `@eudachat-rls.test` users and delete them afterward. Without the
 service role key, those cases skip. CI: `.github/workflows/ci.yml`.
 
+## Reviewer demo
+
+```bash
+npm run seed:reviewer   # service role — creates eudachat-reviewer@example.com + #reviewer-demo
+```
+
+Public creds and checklist: [docs/REVIEWER.md](docs/REVIEWER.md). Do not grant `is_admin` to demo users.
+Seed Chat-owned tables only; never post sample spam into `#general`.
+
 ## Auth recovery
 
 - `/forgot-password` → `resetPasswordForEmail` → `/auth/callback?next=/auth/update-password`

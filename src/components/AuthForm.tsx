@@ -96,6 +96,23 @@ export function AuthForm ({ mode }: { mode: 'login' | 'signup' }) {
       <button type="submit" disabled={loading} className={`w-full ${ui.btnPrimary}`}>
         {loading ? 'Please wait…' : mode === 'signup' ? 'Create account' : 'Sign in'}
       </button>
+      {mode === 'login' && (
+        <p className="rounded-lg border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-xs text-[var(--muted-foreground)]">
+          Peer reviewer demo:{' '}
+          <span className="font-mono text-[var(--foreground)]">eudachat-reviewer@example.com</span>
+          {' / '}
+          <span className="font-mono text-[var(--foreground)]">EudaChat-Review-2026</span>
+          {' · '}
+          <a
+            className={ui.linkAccent}
+            href="https://github.com/joes9987/comms-joes9987/blob/main/docs/REVIEWER.md"
+            target="_blank"
+            rel="noreferrer"
+          >
+            checklist
+          </a>
+        </p>
+      )}
       <p className="text-center text-sm text-[var(--muted-foreground)]">
         {mode === 'signup' ? (
           <>Already have an account? <Link href="/login" className={ui.linkAccent}>Sign in</Link></>
