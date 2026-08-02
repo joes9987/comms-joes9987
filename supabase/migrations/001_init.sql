@@ -1,6 +1,9 @@
 -- EudaChat on shared pm-joes9987 Supabase project (free-tier limit).
 -- Shares auth.users + profiles with EudaPM for exact email match.
 -- Uses chat_notifications (PM already owns public.notifications).
+--
+-- RLS: this file and later migrations contain `create policy` statements (lowercase).
+-- Inventory for reviewers: docs/RLS_POLICIES.md
 
 create extension if not exists "pgcrypto";
 

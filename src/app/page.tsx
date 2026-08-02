@@ -65,16 +65,29 @@ export default async function HomePage () {
             </p>
           </div>
         </div>
+
+        <p className="animate-fade-up mt-12 max-w-lg text-sm text-[var(--muted-foreground)]">
+          Same cohort identity as{' '}
+          <a className="font-semibold text-[var(--primary)] underline-offset-2 hover:underline" href="https://pm-joes9987.vercel.app" target="_blank" rel="noreferrer">EudaPM</a>
+          {' '}and{' '}
+          <a className="font-semibold text-[var(--primary)] underline-offset-2 hover:underline" href="https://showcase-joes9987.vercel.app" target="_blank" rel="noreferrer">EudaMarket</a>
+          . Work tracking for the cohort lives on{' '}
+          <a className="font-semibold text-[var(--primary)] underline-offset-2 hover:underline" href="https://forth-bice.vercel.app" target="_blank" rel="noreferrer">Forth</a>
+          {' '}(winner PM) — Chat is where the conversation happens.
+        </p>
       </section>
 
       <footer className="mx-auto flex w-full max-w-6xl flex-col items-center gap-2 px-4 py-6 text-center text-xs text-[var(--muted)]">
-        <p>Built for the Hult Cohort Program · Euda suite</p>
+        <p>Built for the Hult Cohort Program · Euda suite + Forth</p>
         <p className="flex flex-wrap justify-center gap-3">
           <a className="font-semibold text-[var(--primary)] underline-offset-2 hover:underline" href="https://pm-joes9987.vercel.app" target="_blank" rel="noreferrer">
             EudaPM
           </a>
           <a className="font-semibold text-[var(--primary)] underline-offset-2 hover:underline" href="https://showcase-joes9987.vercel.app" target="_blank" rel="noreferrer">
             EudaMarket
+          </a>
+          <a className="font-semibold text-[var(--primary)] underline-offset-2 hover:underline" href="https://forth-bice.vercel.app" target="_blank" rel="noreferrer">
+            Forth
           </a>
         </p>
       </footer>

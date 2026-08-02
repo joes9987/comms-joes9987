@@ -41,8 +41,9 @@ Browser (React)
 | `messages` | Belongs to exactly one of `channel_id` / `dm_thread_id` (checked in SQL) |
 | `chat_notifications` | In-app alerts for DMs and `@mentions` (PM already owns `notifications`) |
 
-RLS highlights:
+RLS highlights (full inventory: [docs/RLS_POLICIES.md](docs/RLS_POLICIES.md)):
 
+- Policies are versioned in `supabase/migrations/` (`create policy` — lowercase SQL).
 - Everyone authenticated can read all channels and profiles.
 - Only admins (or the channel's own creator) can rename/archive a channel; only admins can post in
   an `announcements`-kind channel or create a new one of that kind.
@@ -50,6 +51,7 @@ RLS highlights:
 - Notifications are only ever visible to / updatable by the owning user. DM and `@mention` rows are
   inserted by `security definer` triggers (no client insert policy). Mention notifications on DMs
   only fire for thread participants (no body-snippet leak to outsiders).
+- Vitest RLS suite + CI: `tests/rls/security.test.ts`, `.github/workflows/ci.yml`.
 
 ## Setup (fresh clone)
 
