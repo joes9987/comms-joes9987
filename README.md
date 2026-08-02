@@ -80,7 +80,11 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=   # local/CI RLS tests only — never commit or put in NEXT_PUBLIC_*
 ```
 
-5. In Supabase Auth settings, disable email confirmation for quick local testing (optional).
+5. In Supabase Auth → URL configuration, allow redirect URLs:
+   - `https://comms-joes9987.vercel.app/auth/callback`
+   - `http://localhost:3000/auth/callback`
+   (same shared project as EudaPM / EudaMarket — also allow their `/auth/confirm` and `/auth/callback` hosts).
+   Disable email confirmation for quick local testing (optional).
 
 6. Run locally:
 
@@ -105,6 +109,7 @@ Requires `SUPABASE_SERVICE_ROLE_KEY` in `.env.local`. Without it, live cases ski
 ## Features
 
 - [x] Email/password auth; `profiles` row auto-created on signup via trigger
+- [x] Password reset (`/forgot-password` → email link → `/auth/callback` → `/auth/update-password`); shared suite account with EudaPM / EudaMarket
 - [x] Channels: `general`, `random`, `help` seeded public; create, rename, archive/unarchive
 - [x] `announcements` channel: everyone can read, only `is_admin` accounts can post
 - [x] Staff management UI (`/app/staff`) — admins can grant/revoke staff for other members

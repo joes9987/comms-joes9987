@@ -32,9 +32,10 @@ export async function updateSession (request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user && request.nextUrl.pathname.startsWith('/app')) {
+  const path = request.nextUrl.pathname
+  if (!user && (path.startsWith('/app') || path.startsWith('/auth/update-password'))) {
     const url = request.nextUrl.clone()
-    url.pathname = '/login'
+    url.pathname = path.startsWith('/auth/update-password') ? '/forgot-password' : '/login'
     return NextResponse.redirect(url)
   }
 

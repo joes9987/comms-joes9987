@@ -41,6 +41,12 @@ npm test   # Vitest RLS suite — needs SUPABASE_SERVICE_ROLE_KEY in .env.local
 Live cases create ephemeral `@eudachat-rls.test` users and delete them afterward. Without the
 service role key, those cases skip. CI: `.github/workflows/ci.yml`.
 
+## Auth recovery
+
+- `/forgot-password` → `resetPasswordForEmail` → `/auth/callback?next=/auth/update-password`
+- Shared Supabase project with EudaPM / EudaMarket — one password, per-host cookies
+- Auth redirect allowlist must include `https://comms-joes9987.vercel.app/auth/callback`
+
 ## Deploy
 
 Production: https://comms-joes9987.vercel.app  

@@ -85,6 +85,13 @@ export function AuthForm ({ mode }: { mode: 'login' | 'signup' }) {
           onChange={(e) => setPassword(e.target.value)}
         />
       </label>
+      {mode === 'login' && (
+        <p className="text-sm">
+          <Link href="/forgot-password" className={ui.linkAccent}>
+            Forgot password?
+          </Link>
+        </p>
+      )}
       {error && <p className={ui.alertError}>{error}</p>}
       <button type="submit" disabled={loading} className={`w-full ${ui.btnPrimary}`}>
         {loading ? 'Please wait…' : mode === 'signup' ? 'Create account' : 'Sign in'}
@@ -93,7 +100,11 @@ export function AuthForm ({ mode }: { mode: 'login' | 'signup' }) {
         {mode === 'signup' ? (
           <>Already have an account? <Link href="/login" className={ui.linkAccent}>Sign in</Link></>
         ) : (
-          <>Need an account? <Link href="/signup" className={ui.linkAccent}>Sign up</Link></>
+          <>
+            Need an account? <Link href="/signup" className={ui.linkAccent}>Sign up</Link>
+            {' · '}
+            Same account as EudaPM / EudaMarket.
+          </>
         )}
       </p>
     </form>
