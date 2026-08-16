@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useRef, useState } from 'react'
 import { AppearanceSettings } from '@/components/AppearanceSettings'
+import { CloseFriendsEditor } from '@/components/CloseFriendsEditor'
 import { Avatar } from '@/components/Avatar'
 import { ProfileCard } from '@/components/ProfileCard'
 import { parseLocale } from '@/lib/locale'
@@ -384,6 +385,7 @@ export function ProfileEditor ({ profile }: ProfileEditorProps) {
         </button>
       </form>
 
+      <CloseFriendsEditor />
       <AppearanceSettings />
 
       {success && <p className={`mt-4 ${ui.alertSuccess}`} role="status">{success}</p>}

@@ -73,6 +73,8 @@ export function AppearanceSettings () {
       <p className={ui.sectionTitle}>App background</p>
       <p className="mt-1 text-sm text-[var(--muted)]">
         Only you see this — it does not appear on your public profile card.
+        The Trinidad & Tobago palette is a separate opt-in: enable Creole on this page
+        to turn on <code>tt-mode</code> (flag red + lime). Light/dark stays independent.
       </p>
 
       <div className="mt-4 grid gap-2 sm:grid-cols-2">

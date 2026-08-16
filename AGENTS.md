@@ -32,6 +32,7 @@ messages, an admin-only announcements channel, keyword search, and realtime upda
 `chat_notifications` (DM + `@mention` alerts via security-definer triggers; **not** PM’s
 `notifications` table). Private DOB lives in `profile_private` (owner-only RLS). Social
 feed tables (`posts`, `follows`, `statuses`, `blocks`, …) are in `007_social_graph.sql`.
+E2EE / push / reactions are in `009_e2ee_push.sql`. Do not add a Chat-owned `notifications` table.
 
 See [supabase/migrations/](supabase/migrations/) for schema, RLS, and storage policies.
 

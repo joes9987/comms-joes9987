@@ -369,6 +369,22 @@ function SidebarNav ({
 
       <div className="space-y-0.5">
         <Link
+          href="/app/feed"
+          onClick={onNavigate}
+          className={ui.navLink}
+          aria-current={pathname.startsWith('/app/feed') || pathname.startsWith('/app/p/') ? 'page' : undefined}
+        >
+          Feed
+        </Link>
+        <Link
+          href="/app/discover"
+          onClick={onNavigate}
+          className={ui.navLink}
+          aria-current={pathname.startsWith('/app/discover') || pathname.startsWith('/app/tag/') ? 'page' : undefined}
+        >
+          Discover
+        </Link>
+        <Link
           href="/app/search"
           onClick={onNavigate}
           className={ui.navLink}
@@ -384,12 +400,20 @@ function SidebarNav ({
         >
           Edit profile
         </Link>
+        <Link
+          href="/app/calls"
+          onClick={onNavigate}
+          className={ui.navLink}
+          aria-current={pathname.startsWith('/app/calls') ? 'page' : undefined}
+        >
+          Calls
+        </Link>
         {currentUser.isAdmin && (
           <Link
             href="/app/staff"
             onClick={onNavigate}
             className={ui.navLink}
-            aria-current={pathname === '/app/staff' ? 'page' : undefined}
+            aria-current={pathname.startsWith('/app/staff') ? 'page' : undefined}
           >
             Manage staff
           </Link>
@@ -503,6 +527,7 @@ export function AppChrome ({ channels, dmThreads, initialNotifications, children
             </div>
             <div className="flex items-center gap-2">
               <ThemeToggle />
+              <Link href="/app/feed" className={ui.btnGhost}>Feed</Link>
               <Link href="/app/search" className={ui.btnGhost}>Search</Link>
               <NotificationBell userId={currentUser.id} initialNotifications={initialNotifications} />
             </div>

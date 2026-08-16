@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useAppData } from '@/lib/app-context'
@@ -51,6 +52,8 @@ export function StaffManager ({ profiles }: { profiles: Profile[] }) {
         <p className="mt-2 max-w-xl text-sm text-[var(--muted-foreground)]">
           Staff can post in <span className="font-medium text-[var(--foreground)]">#announcements</span>.
           Grant or revoke access for any cohort member. At least one staff account must remain.
+          {' '}
+          <Link href="/app/staff/reports" className={ui.linkAccent}>Open the reports queue</Link>.
         </p>
       </header>
 

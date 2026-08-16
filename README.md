@@ -44,7 +44,10 @@ Browser (React)
 | `follows` / `close_friends` | Directed follow graph; owner-only close-friends list |
 | `posts` / `comments` / `likes` / `hashtags` | Public feed (reposts via `posts.reposted_from`) |
 | `statuses` | 24h stories (`public` or `close_friends`; E2EE ciphertext reserved) |
-| `blocks` / `mutes` / `reports` | Safety primitives; staff review UI comes later |
+| `blocks` / `mutes` / `reports` | Safety primitives; staff queue at `/app/staff/reports` |
+| `pre_key_bundles` / `message_envelopes` | Signal E2EE transport over Supabase Realtime |
+| `push_tokens` | Expo / web push device tokens (not EudaPM `notifications`) |
+| `post_reactions` | Optional Trini reactions when `tt-mode` is on |
 | Storage `post-media` | Public images/video for posts |
 | Storage `chat-blob` / `status-blob` | Private encrypted blobs (E2EE later) |
 
@@ -71,9 +74,10 @@ pnpm install
 ```
 
 2. Create a Supabase project (or use an existing one) and run
-   [`supabase/migrations/`](supabase/migrations/) (`001` through `008`) in the SQL editor (or via
+   [`supabase/migrations/`](supabase/migrations/) (`001` through `009`) in the SQL editor (or via
    `supabase db push`). `001` creates channels/DMs/messages and seeds `general`, `random`, `help`,
    and `announcements`. `007` adds the social-graph / feed tables. `008` adds `profiles.locale`.
+   `009` adds Signal pre-key bundles, message envelopes, push tokens, and Trini post reactions.
 
 3. Copy the committed env template:
 
@@ -141,7 +145,15 @@ Requires `SUPABASE_SERVICE_ROLE_KEY` in `apps/web/.env.local`. Without it, live 
 - [x] Discord-style profile popover from chat names, avatars, and `@mentions`
 - [x] Personal app background presets + custom wallpaper (local to this browser)
 - [x] Vitest RLS suite + GitHub Actions CI (DM isolation, mention privacy, staff escalation, channel update)
-- [x] Social-graph schema (`007_social_graph.sql`) — posts, follows, statuses, blocks/mutes/reports; no feed UI yet
+- [x] Social feed (`/app/feed`) — compose, like, comment, repost, follow, For You / Following, hashtags
+- [x] Discover + profile timelines (`/app/discover`, `/app/u/[handle]`, `/app/tag/[tag]`)
+- [x] 24h statuses (`/app/status/new`) with public and close-friends visibility
+- [x] T&T theme (`tt-mode`) + Trini reactions when Creole locale is on
+- [x] Moderation: report / mute / block + staff reports queue
+- [x] Signal crypto package (`@euda/crypto`) + `pre_key_bundles` / `message_envelopes` over Realtime
+- [x] Push token table + web service worker (VAPID optional); Expo fanout Edge Function stub
+- [x] LiveKit token route (`/api/calls/token`) — stub until cloud keys are set
+- [x] Expo mobile stub in `apps/mobile` (same Supabase project)
 
 ## Known limitations
 
