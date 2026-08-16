@@ -7,6 +7,7 @@ export type Profile = {
   avatar_url?: string | null
   banner_url?: string | null
   bio?: string | null
+  locale?: 'en' | 'tcr'
   date_of_birth?: string | null
   created_at?: string
 }

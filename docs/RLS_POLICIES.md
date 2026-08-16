@@ -3,7 +3,7 @@
 All authorization for Chat tables is in `supabase/migrations/*.sql` (PostgreSQL accepts
 `create policy` lowercase — a case-sensitive search for `CREATE POLICY` will miss them).
 
-A fresh `supabase db reset` / SQL editor apply of `001`→`007` recreates these policies.
+A fresh `supabase db reset` / SQL editor apply of `001`→`008` recreates these policies.
 
 | Migration | Policies / guards |
 |-----------|-------------------|
@@ -13,6 +13,7 @@ A fresh `supabase db reset` / SQL editor apply of `001`→`007` recreates these 
 | [`004_private_dob.sql`](../supabase/migrations/004_private_dob.sql) | `Users manage own private profile` on `profile_private` |
 | [`006_rls_hardening.sql`](../supabase/migrations/006_rls_hardening.sql) | Recreates `channels_update` as creator-or-admin; DM mention participant check; drops client insert on `chat_notifications` |
 | [`007_social_graph.sql`](../supabase/migrations/007_social_graph.sql) | Feed/graph: `follows`, `close_friends`, `posts`, `comments`, `likes`, `hashtags`, `statuses`, `media`, `blocks`, `mutes`, `reports`. Authenticated-only. Public posts readable by cohort; followers/close-friends gated; blocks hide both ways. Reports: reporter or staff. Storage: `post-media` public read; `chat-blob` / `status-blob` owner-only. Existing channel/DM policies unchanged. |
+| [`008_auth_locale.sql`](../supabase/migrations/008_auth_locale.sql) | `profiles.locale` (`en` default, `tcr` opt-in). `handle_new_user` reads `locale` / Google `full_name` from auth metadata. No new policies — owner profile update still applies. |
 
 `profiles` base RLS is shared with EudaPM on the same Supabase project (cohort identity). Chat
 migrations add handle/admin columns and admin manage policy; they do not redefine PM’s core

@@ -34,7 +34,7 @@ Browser (React)
 
 | Table | Purpose |
 |-------|---------|
-| `profiles` | Cohort member email, display name, `handle`, `avatar_url`, `banner_url`, `bio`, `is_admin` |
+| `profiles` | Cohort member email, display name, `handle`, `avatar_url`, `banner_url`, `bio`, `is_admin`, `locale` (`en` default, `tcr` opt-in) |
 | `profile_private` | Per-user private fields (e.g. date of birth) — RLS: owner only |
 | Storage `avatars` | Public bucket for profile pictures, banners, and personal wallpapers (2 MB, image MIME types) |
 | `channels` | Named rooms; `kind` is `public` or `announcements`; `archived_at` soft-archive |
@@ -71,9 +71,9 @@ pnpm install
 ```
 
 2. Create a Supabase project (or use an existing one) and run
-   [`supabase/migrations/`](supabase/migrations/) (`001` through `007`) in the SQL editor (or via
+   [`supabase/migrations/`](supabase/migrations/) (`001` through `008`) in the SQL editor (or via
    `supabase db push`). `001` creates channels/DMs/messages and seeds `general`, `random`, `help`,
-   and `announcements`. `007` adds the social-graph / feed tables.
+   and `announcements`. `007` adds the social-graph / feed tables. `008` adds `profiles.locale`.
 
 3. Copy the committed env template:
 
@@ -94,6 +94,9 @@ SUPABASE_SERVICE_ROLE_KEY=   # local/CI RLS tests only — never commit or put i
    - `http://localhost:3000/auth/callback`
    (same shared project as EudaPM / EudaMarket — also allow their `/auth/confirm` and `/auth/callback` hosts).
    Disable email confirmation for quick local testing (optional).
+   To enable **Continue with Google**, turn on the Google provider in that same Auth dashboard
+   (client id/secret from Google Cloud). The button is in the product either way; it surfaces
+   Supabase’s error if the provider is still off.
 
 6. Run locally:
 
@@ -120,6 +123,8 @@ Requires `SUPABASE_SERVICE_ROLE_KEY` in `apps/web/.env.local`. Without it, live 
 ## Features
 
 - [x] Email/password auth; `profiles` row auto-created on signup via trigger
+- [x] Google OAuth (`Continue with Google` → `/auth/callback` → `/onboarding`); same shared Supabase project
+- [x] Optional Trinidadian Creole locale (`tcr`) on signup, onboarding, and profile — default English
 - [x] Shared reviewer demo (`eudachat-reviewer@example.com`) with seeded `#reviewer-demo` + DM — see [docs/REVIEWER.md](docs/REVIEWER.md)
 - [x] Password reset (`/forgot-password` → email link → `/auth/callback` → `/auth/update-password`); shared suite account with EudaPM / EudaMarket
 - [x] Channels: `general`, `random`, `help` seeded public; create, rename, archive/unarchive
