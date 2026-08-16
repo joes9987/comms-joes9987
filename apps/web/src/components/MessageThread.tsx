@@ -71,6 +71,8 @@ export function MessageThread ({ target, initialMessages }: MessageThreadProps) 
 
   useEffect(() => {
     prevCountRef.current = initialMessages.length
+    // Reset the thread when the conversation identity changes (not on every render).
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- conversation switch
     setMessages(initialMessages)
     setLiveAnnouncement('')
   }, [target.id, target.type])

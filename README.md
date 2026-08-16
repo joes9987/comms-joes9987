@@ -12,6 +12,7 @@ https://comms-joes9987.vercel.app
 
 ## Stack
 
+- **pnpm 9** + **Turborepo** workspace (`apps/web` is the Next.js app)
 - **Next.js 16** (App Router) · **React 19** · **TypeScript**
 - **Supabase** (Auth + Postgres + Row Level Security + Realtime)
 - **Tailwind CSS 4**
@@ -51,7 +52,7 @@ RLS highlights (full inventory: [docs/RLS_POLICIES.md](docs/RLS_POLICIES.md)):
 - Notifications are only ever visible to / updatable by the owning user. DM and `@mention` rows are
   inserted by `security definer` triggers (no client insert policy). Mention notifications on DMs
   only fire for thread participants (no body-snippet leak to outsiders).
-- Vitest RLS suite + CI: `tests/rls/security.test.ts`, `.github/workflows/ci.yml`.
+- Vitest RLS suite + CI: `apps/web/tests/rls/security.test.ts`, `.github/workflows/ci.yml`.
 
 ## Setup (fresh clone)
 
@@ -60,7 +61,7 @@ RLS highlights (full inventory: [docs/RLS_POLICIES.md](docs/RLS_POLICIES.md)):
 ```bash
 git clone https://github.com/joes9987/comms-joes9987.git
 cd comms-joes9987
-npm install
+pnpm install
 ```
 
 2. Create a Supabase project (or use an existing one) and run
@@ -71,7 +72,7 @@ npm install
 3. Copy the committed env template:
 
 ```bash
-cp .env.example .env.local
+cp .env.example apps/web/.env.local
 ```
 
 4. Fill in:
@@ -91,24 +92,24 @@ SUPABASE_SERVICE_ROLE_KEY=   # local/CI RLS tests only — never commit or put i
 6. Run locally:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 7. Sign up, land in `#general`. The first staff account (`singhjoe57@gmail.com`) is bootstrapped
    by migration `002_staff_management.sql`. Other staff can be granted in-app at **Manage staff**
    (`/app/staff`) by an existing admin.
 
-8. Build for production: `npm run build`
+8. Build for production: `pnpm build`
 
 9. Optional — RLS security suite (creates ephemeral users, cleans them up):
 
 ```bash
-npm test
+pnpm test
 ```
 
-Requires `SUPABASE_SERVICE_ROLE_KEY` in `.env.local`. Without it, live cases skip. GitHub Actions runs the same suite when repo secrets are set (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`).
+Requires `SUPABASE_SERVICE_ROLE_KEY` in `apps/web/.env.local`. Without it, live cases skip. GitHub Actions runs the same suite when repo secrets are set (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`).
 
-**Peer reviewers:** See [docs/REVIEWER.md](docs/REVIEWER.md) for the shared demo account (`eudachat-reviewer@example.com`) and smoke checklist. Refresh seed data with `npm run seed:reviewer` (service role required).
+**Peer reviewers:** See [docs/REVIEWER.md](docs/REVIEWER.md) for the shared demo account (`eudachat-reviewer@example.com`) and smoke checklist. Refresh seed data with `pnpm seed:reviewer` (service role required).
 
 ## Features
 

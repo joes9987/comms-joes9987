@@ -1,0 +1,12 @@
+{
+  "name": "@euda/mobile",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "node -e \"process.exit(0)\"",
+    "dev": "node -e \"process.exit(0)\"",
+    "lint": "node -e \"process.exit(0)\"",
+    "test": "node -e \"process.exit(0)\"",
+    "typecheck": "node -e \"process.exit(0)\""
+  }
+}

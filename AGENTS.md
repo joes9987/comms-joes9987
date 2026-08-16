@@ -11,17 +11,19 @@ messages, an admin-only announcements channel, keyword search, and realtime upda
 |------|------|------|
 | Research | Cursor | Reused auth/session patterns from `pm-joes9987` (Supabase SSR client/server/middleware) |
 | Development | Cursor | Next.js App Router + Supabase schema, RLS, triggers, chat UI |
-| QA | Cursor | Fresh-clone install, `npm run build`, manual smoke path for auth/channels/DMs |
+| QA | Cursor | Fresh-clone install, `pnpm build`, manual smoke path for auth/channels/DMs |
 
 ## Conventions
 
 - Small focused commits; one concern per commit.
-- No secrets in repo; `.env.local` gitignored, `.env.example` is the committed template.
+- pnpm 9 + Turborepo. The Next.js app lives in `apps/web` (`@euda/web`).
+- No secrets in repo; `.env.local` gitignored, `.env.example` is the committed template
+  (copy to `apps/web/.env.local` for local Next/Vitest).
 - `@supabase/ssr` cookie handling uses **only** `getAll`/`setAll` — never the deprecated
   `get`/`set`/`remove` per-cookie API.
 - `firebase-admin`-style server/client split is not applicable here (Supabase project), but the
-  same spirit applies: `src/lib/supabase/server.ts` (server-only) is never imported from
-  `'use client'` components — client components use `src/lib/supabase/client.ts`.
+  same spirit applies: `apps/web/src/lib/supabase/server.ts` (server-only) is never imported from
+  `'use client'` components — client components use `apps/web/src/lib/supabase/client.ts`.
 
 ## Data model quick reference
 
@@ -35,7 +37,7 @@ See [supabase/migrations/](supabase/migrations/) for schema, RLS, and storage po
 ## Testing
 
 ```bash
-npm test   # Vitest RLS suite — needs SUPABASE_SERVICE_ROLE_KEY in .env.local
+pnpm test   # Vitest RLS suite — needs SUPABASE_SERVICE_ROLE_KEY in apps/web/.env.local
 ```
 
 Live cases create ephemeral `@eudachat-rls.test` users and delete them afterward. Without the
@@ -44,7 +46,7 @@ service role key, those cases skip. CI: `.github/workflows/ci.yml`.
 ## Reviewer demo
 
 ```bash
-npm run seed:reviewer   # service role — creates eudachat-reviewer@example.com + #reviewer-demo
+pnpm seed:reviewer   # service role — creates eudachat-reviewer@example.com + #reviewer-demo
 ```
 
 Public creds and checklist: [docs/REVIEWER.md](docs/REVIEWER.md). Do not grant `is_admin` to demo users.

@@ -1,37 +1,21 @@
 {
   "name": "comms-joes9987",
-  "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@9.15.0",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "seed:reviewer": "node scripts/seed-reviewer-demo.mjs"
-  },
-  "dependencies": {
-    "@supabase/ssr": "^0.12.1",
-    "@supabase/supabase-js": "^2.110.3",
-    "next": "16.2.10",
-    "next-themes": "^0.4.6",
-    "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "dev": "turbo run dev --filter=@euda/web",
+    "build": "turbo run build --filter=@euda/web",
+    "lint": "turbo run lint --filter=@euda/web",
+    "test": "turbo run test --filter=@euda/web",
+    "typecheck": "turbo run typecheck --filter=@euda/web",
+    "seed:reviewer": "pnpm --filter @euda/web seed:reviewer"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "dotenv": "^17.4.2",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.10",
-    "tailwindcss": "^4",
-    "typescript": "^5",
-    "vitest": "^4.1.10"
+    "turbo": "^2.5.0",
+    "typescript": "^5"
   },
-  "optionalDependencies": {
-    "lightningcss-win32-x64-msvc": "^1.32.0"
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
   }
 }

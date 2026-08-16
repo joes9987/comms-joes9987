@@ -2,7 +2,7 @@
  * Seed or refresh the shared reviewer demo accounts for EudaChat.
  * Requires SUPABASE_URL (or NEXT_PUBLIC_SUPABASE_URL) + SUPABASE_SERVICE_ROLE_KEY.
  *
- * Usage: npm run seed:reviewer
+ * Usage: pnpm seed:reviewer
  *
  * Seeds Chat-owned rows only (channels / dm_threads / messages). Does not touch
  * EudaPM projects/tasks or grant is_admin. Does not post into #general.
@@ -13,6 +13,8 @@ import { resolve } from 'node:path'
 
 config({ path: resolve(process.cwd(), '.env.local') })
 config({ path: resolve(process.cwd(), '.env') })
+config({ path: resolve(process.cwd(), '../../.env.local') })
+config({ path: resolve(process.cwd(), '../../.env') })
 
 const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY

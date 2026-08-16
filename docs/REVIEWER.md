@@ -20,7 +20,7 @@ Prefer posting in `#reviewer-demo` rather than `#general` so the live cohort sta
 Refresh the seed after schema changes (service role required):
 
 ```bash
-npm run seed:reviewer
+pnpm seed:reviewer
 ```
 
 ## Smoke checklist
@@ -39,4 +39,4 @@ npm run seed:reviewer
 
 ## RLS / security notes
 
-Policy inventory: [RLS_POLICIES.md](RLS_POLICIES.md). Automated suite: `npm test` (`tests/rls/security.test.ts`).
+Policy inventory: [RLS_POLICIES.md](RLS_POLICIES.md). Automated suite: `pnpm test` (`apps/web/tests/rls/security.test.ts`).
