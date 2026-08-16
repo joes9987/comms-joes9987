@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { useState, useSyncExternalStore, type CSSProperties } from 'react'
+import { useEffect, useState, useSyncExternalStore, type CSSProperties } from 'react'
 import { Avatar } from '@/components/Avatar'
 import { NotificationBell } from '@/components/NotificationBell'
 import { ProfileTrigger } from '@/components/ProfilePopover'
@@ -40,7 +40,7 @@ function SignOutButton () {
   )
 }
 
-function ChannelRow ({ channel }: { channel: Channel }) {
+function ChannelRow ({ channel, onNavigate }: { channel: Channel; onNavigate?: () => void }) {
   const { currentUser } = useAppData()
   const router = useRouter()
   const pathname = usePathname()
@@ -77,16 +77,19 @@ function ChannelRow ({ channel }: { channel: Channel }) {
   if (editing) {
     return (
       <li className="flex items-center gap-1 px-1">
-        <input
-          autoFocus
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') void rename()
-            if (e.key === 'Escape') setEditing(false)
-          }}
-          className={`${ui.field} mt-0 py-1 text-sm`}
-        />
+        <label className="min-w-0 flex-1">
+          <span className="sr-only">Rename channel</span>
+          <input
+            autoFocus
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') void rename()
+              if (e.key === 'Escape') setEditing(false)
+            }}
+            className={`${ui.field} mt-0 py-1 text-sm`}
+          />
+        </label>
         <button type="button" onClick={() => void rename()} className={ui.btnGhostSm} disabled={busy}>Save</button>
       </li>
     )
@@ -96,18 +99,33 @@ function ChannelRow ({ channel }: { channel: Channel }) {
     <li className="group flex items-center justify-between gap-1">
       <Link
         href={`/app/c/${channel.slug}`}
+        onClick={onNavigate}
         className={`${ui.navLink} min-w-0 flex-1 truncate ${active ? ui.navLinkActive : ''}`}
+        aria-current={active ? 'page' : undefined}
       >
         <span className="truncate">
-          {channel.kind === 'announcements' ? '📣 ' : '# '}{channel.name}
+          <span aria-hidden="true">{channel.kind === 'announcements' ? '📣 ' : '# '}</span>
+          {channel.name}
         </span>
         {channel.archived_at && <span className="ml-1 shrink-0 text-xs text-[var(--muted)]">(archived)</span>}
       </Link>
       {canManage && (
-        <span className="hidden shrink-0 gap-1 group-hover:flex">
-          <button type="button" onClick={() => setEditing(true)} className={ui.btnGhostSm} title="Rename">✎</button>
-          <button type="button" onClick={() => void toggleArchive()} className={ui.btnGhostSm} title={channel.archived_at ? 'Unarchive' : 'Archive'}>
-            {channel.archived_at ? '↺' : '🗄'}
+        <span className="flex shrink-0 gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-within:opacity-100">
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className={ui.btnGhostSm}
+            aria-label={`Rename ${channel.name}`}
+          >
+            <span aria-hidden="true">✎</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => void toggleArchive()}
+            className={ui.btnGhostSm}
+            aria-label={channel.archived_at ? `Unarchive ${channel.name}` : `Archive ${channel.name}`}
+          >
+            <span aria-hidden="true">{channel.archived_at ? '↺' : '🗄'}</span>
           </button>
         </span>
       )}
@@ -155,18 +173,25 @@ function CreateChannelForm () {
 
   return (
     <div className="px-1 py-1">
-      <input
-        autoFocus
-        value={name}
-        placeholder="channel-name"
-        onChange={(e) => setName(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') void create()
-          if (e.key === 'Escape') setOpen(false)
-        }}
-        className={`${ui.field} mt-0 py-1 text-sm`}
-      />
-      {error && <p className={`${ui.alertError} mt-1`}>{error}</p>}
+      <label className="block">
+        <span className="sr-only">New channel name</span>
+        <input
+          autoFocus
+          value={name}
+          placeholder="channel-name"
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') void create()
+            if (e.key === 'Escape') setOpen(false)
+          }}
+          className={`${ui.field} mt-0 py-1 text-sm`}
+        />
+      </label>
+      {error && (
+        <p role="alert" className={`${ui.alertError} mt-1`}>
+          {error}
+        </p>
+      )}
       <div className="mt-1.5 flex gap-2">
         <button type="button" onClick={() => void create()} disabled={busy} className={ui.btnGhostSm}>Create</button>
         <button type="button" onClick={() => setOpen(false)} className={ui.btnGhostSm}>Cancel</button>
@@ -242,7 +267,7 @@ function DmPicker () {
   )
 }
 
-function DmRow ({ thread }: { thread: DmThread }) {
+function DmRow ({ thread, onNavigate }: { thread: DmThread; onNavigate?: () => void }) {
   const { currentUser, profileMap } = useAppData()
   const pathname = usePathname()
   const peerId = thread.user_a === currentUser.id ? thread.user_b : thread.user_a
@@ -254,7 +279,12 @@ function DmRow ({ thread }: { thread: DmThread }) {
       <ProfileTrigger profile={peer} className="shrink-0 px-1 py-1.5">
         <Avatar profile={peer} size="sm" />
       </ProfileTrigger>
-      <Link href={`/app/dm/${thread.id}`} className={`${ui.navLink} min-w-0 flex-1 ${active ? '' : ''}`}>
+      <Link
+        href={`/app/dm/${thread.id}`}
+        onClick={onNavigate}
+        className={`${ui.navLink} min-w-0 flex-1`}
+        aria-current={active ? 'page' : undefined}
+      >
         <span className="truncate">{profileLabel(peer)}</span>
       </Link>
     </li>
@@ -280,9 +310,99 @@ function useWallpaperPrefs (): WallpaperPrefs {
   return JSON.parse(snapshot) as WallpaperPrefs
 }
 
+function SidebarNav ({
+  channels,
+  dmThreads,
+  showArchived,
+  setShowArchived,
+  onNavigate
+}: {
+  channels: Channel[]
+  dmThreads: DmThread[]
+  showArchived: boolean
+  setShowArchived: (updater: (value: boolean) => boolean) => void
+  onNavigate?: () => void
+}) {
+  const { currentUser } = useAppData()
+  const pathname = usePathname()
+  const visibleChannels = channels.filter((c) => showArchived || !c.archived_at)
+  const announcementsChannels = visibleChannels.filter((c) => c.kind === 'announcements')
+  const publicChannels = visibleChannels.filter((c) => c.kind !== 'announcements')
+
+  return (
+    <nav className="flex-1 space-y-4 overflow-y-auto" aria-label="Channels and direct messages">
+      <div>
+        <p className={`${ui.metricLabel} px-2`}>Channels</p>
+        <ul className="mt-1 space-y-0.5">
+          {announcementsChannels.map((c) => (
+            <ChannelRow key={c.id} channel={c} onNavigate={onNavigate} />
+          ))}
+          {publicChannels.map((c) => (
+            <ChannelRow key={c.id} channel={c} onNavigate={onNavigate} />
+          ))}
+        </ul>
+        <div className="mt-1">
+          <CreateChannelForm />
+        </div>
+        {channels.some((c) => c.archived_at) && (
+          <button
+            type="button"
+            onClick={() => setShowArchived((v) => !v)}
+            className={`${ui.btnGhostSm} mt-1 ml-1`}
+          >
+            {showArchived ? 'Hide archived' : 'Show archived'}
+          </button>
+        )}
+      </div>
+
+      <div>
+        <p className={`${ui.metricLabel} px-2`}>Direct messages</p>
+        <ul className="mt-1 space-y-0.5">
+          {dmThreads.map((t) => (
+            <DmRow key={t.id} thread={t} onNavigate={onNavigate} />
+          ))}
+        </ul>
+        <div className="mt-1">
+          <DmPicker />
+        </div>
+      </div>
+
+      <div className="space-y-0.5">
+        <Link
+          href="/app/search"
+          onClick={onNavigate}
+          className={ui.navLink}
+          aria-current={pathname === '/app/search' ? 'page' : undefined}
+        >
+          Search
+        </Link>
+        <Link
+          href="/app/profile"
+          onClick={onNavigate}
+          className={ui.navLink}
+          aria-current={pathname === '/app/profile' ? 'page' : undefined}
+        >
+          Edit profile
+        </Link>
+        {currentUser.isAdmin && (
+          <Link
+            href="/app/staff"
+            onClick={onNavigate}
+            className={ui.navLink}
+            aria-current={pathname === '/app/staff' ? 'page' : undefined}
+          >
+            Manage staff
+          </Link>
+        )}
+      </div>
+    </nav>
+  )
+}
+
 export function AppChrome ({ channels, dmThreads, initialNotifications, children }: AppChromeProps) {
   const { currentUser, profileMap } = useAppData()
   const [showArchived, setShowArchived] = useState(false)
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const wallpaper = useWallpaperPrefs()
   const selfProfile = profileMap[currentUser.id] ?? {
     id: currentUser.id,
@@ -294,14 +414,21 @@ export function AppChrome ({ channels, dmThreads, initialNotifications, children
     bio: currentUser.bio
   }
 
-  const visibleChannels = channels.filter((c) => showArchived || !c.archived_at)
-  const announcementsChannels = visibleChannels.filter((c) => c.kind === 'announcements')
-  const publicChannels = visibleChannels.filter((c) => c.kind !== 'announcements')
+  useEffect(() => {
+    if (!mobileNavOpen) return
+    function onKeyDown (event: KeyboardEvent) {
+      if (event.key === 'Escape') setMobileNavOpen(false)
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [mobileNavOpen])
 
   const wallpaperStyle: CSSProperties | undefined =
     wallpaper.mode === 'custom' && wallpaper.url
       ? ({ ['--wallpaper-image']: `url(${wallpaper.url})` } as CSSProperties)
       : undefined
+
+  const closeMobileNav = () => setMobileNavOpen(false)
 
   return (
     <div
@@ -344,47 +471,12 @@ export function AppChrome ({ channels, dmThreads, initialNotifications, children
             </Link>
           </div>
 
-          <nav className="flex-1 space-y-4 overflow-y-auto">
-            <div>
-              <p className={`${ui.metricLabel} px-2`}>Channels</p>
-              <ul className="mt-1 space-y-0.5">
-                {announcementsChannels.map((c) => <ChannelRow key={c.id} channel={c} />)}
-                {publicChannels.map((c) => <ChannelRow key={c.id} channel={c} />)}
-              </ul>
-              <div className="mt-1">
-                <CreateChannelForm />
-              </div>
-              {channels.some((c) => c.archived_at) && (
-                <button
-                  type="button"
-                  onClick={() => setShowArchived((v) => !v)}
-                  className={`${ui.btnGhostSm} mt-1 ml-1`}
-                >
-                  {showArchived ? 'Hide archived' : 'Show archived'}
-                </button>
-              )}
-            </div>
-
-            <div>
-              <p className={`${ui.metricLabel} px-2`}>Direct messages</p>
-              <ul className="mt-1 space-y-0.5">
-                {dmThreads.map((t) => <DmRow key={t.id} thread={t} />)}
-              </ul>
-              <div className="mt-1">
-                <DmPicker />
-              </div>
-            </div>
-
-            <div className="space-y-0.5">
-              <Link href="/app/search" className={ui.navLink}>Search</Link>
-              <Link href="/app/profile" className={ui.navLink}>Edit profile</Link>
-              {currentUser.isAdmin && (
-                <Link href="/app/staff" className={ui.navLink}>
-                  Manage staff
-                </Link>
-              )}
-            </div>
-          </nav>
+          <SidebarNav
+            channels={channels}
+            dmThreads={dmThreads}
+            showArchived={showArchived}
+            setShowArchived={setShowArchived}
+          />
 
           <div className="mt-3 flex items-center justify-between gap-2 border-t border-[var(--border)] pt-3">
             <SignOutButton />
@@ -392,27 +484,57 @@ export function AppChrome ({ channels, dmThreads, initialNotifications, children
           </div>
         </aside>
 
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="relative flex min-w-0 flex-1 flex-col">
           <header className="app-header flex items-center justify-between gap-3 px-4 py-3 sm:hidden">
-            <Link href="/app" className="flex items-center gap-2">
-              <EudaChatLogo />
-              <span className="font-display text-base font-bold"><span className="text-gradient">EudaChat</span></span>
-            </Link>
+            <div className="flex min-w-0 items-center gap-2">
+              <button
+                type="button"
+                className={ui.btnGhost}
+                aria-expanded={mobileNavOpen}
+                aria-controls="mobile-channel-nav"
+                onClick={() => setMobileNavOpen((open) => !open)}
+              >
+                {mobileNavOpen ? 'Close' : 'Channels'}
+              </button>
+              <Link href="/app" className="flex min-w-0 items-center gap-2">
+                <EudaChatLogo />
+                <span className="font-display text-base font-bold"><span className="text-gradient">EudaChat</span></span>
+              </Link>
+            </div>
             <div className="flex items-center gap-2">
               <ThemeToggle />
               <Link href="/app/search" className={ui.btnGhost}>Search</Link>
-              <Link href="/app/profile" className={ui.btnGhost}>Profile</Link>
-              {currentUser.isAdmin && (
-                <Link href="/app/staff" className={ui.btnGhost}>Staff</Link>
-              )}
               <NotificationBell userId={currentUser.id} initialNotifications={initialNotifications} />
             </div>
           </header>
+
+          {mobileNavOpen && (
+            <div
+              id="mobile-channel-nav"
+              role="dialog"
+              aria-label="Channels and direct messages"
+              className="surface-elevated absolute inset-x-0 top-14 z-40 max-h-[min(70vh,32rem)] overflow-y-auto border-b border-[var(--border)] px-3 py-4 sm:hidden"
+            >
+              <SidebarNav
+                channels={channels}
+                dmThreads={dmThreads}
+                showArchived={showArchived}
+                setShowArchived={setShowArchived}
+                onNavigate={closeMobileNav}
+              />
+              <div className="mt-3 border-t border-[var(--border)] pt-3">
+                <SignOutButton />
+              </div>
+            </div>
+          )}
+
           <div className="hidden items-center justify-end gap-2 border-b border-[var(--border)] px-4 py-2 sm:flex">
             <ThemeToggle />
             <NotificationBell userId={currentUser.id} initialNotifications={initialNotifications} />
           </div>
-          <main className="min-h-0 flex-1">{children}</main>
+          <main id="main-content" tabIndex={-1} className="min-h-0 flex-1">
+            {children}
+          </main>
         </div>
       </div>
     </div>

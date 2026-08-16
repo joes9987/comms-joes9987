@@ -46,14 +46,18 @@ export default async function SearchPage ({ searchParams }: SearchPageProps) {
       <p className={ui.eyebrow}>Search</p>
       <h1 className={`${ui.pageTitle} mt-1`}>Find a message</h1>
 
-      <form method="get" className="mt-4 flex gap-2">
-        <input
-          name="q"
-          defaultValue={query}
-          placeholder="Search keywords across channels and your DMs…"
-          className={`${ui.field} mt-0`}
-          autoFocus
-        />
+      <form method="get" className="mt-4 flex gap-2" role="search">
+        <label className="min-w-0 flex-1">
+          <span className="sr-only">Search messages</span>
+          <input
+            name="q"
+            type="search"
+            defaultValue={query}
+            placeholder="Search keywords across channels and your DMs…"
+            className={`${ui.field} mt-0`}
+            autoFocus
+          />
+        </label>
         <button type="submit" className={ui.btnPrimary}>Search</button>
       </form>
 

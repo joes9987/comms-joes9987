@@ -48,8 +48,16 @@ export function ForgotPasswordForm () {
       <button type="submit" disabled={loading} className={`w-full ${ui.btnPrimary}`}>
         {loading ? 'Sending…' : 'Send reset link'}
       </button>
-      {success && <p className={ui.alertSuccess}>{success}</p>}
-      {error && <p className={ui.alertError}>{error}</p>}
+      {success && (
+        <p role="status" className={ui.alertSuccess}>
+          {success}
+        </p>
+      )}
+      {error && (
+        <p role="alert" className={ui.alertError}>
+          {error}
+        </p>
+      )}
     </form>
   )
 }

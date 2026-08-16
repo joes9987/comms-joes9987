@@ -92,7 +92,11 @@ export function AuthForm ({ mode }: { mode: 'login' | 'signup' }) {
           </Link>
         </p>
       )}
-      {error && <p className={ui.alertError}>{error}</p>}
+      {error && (
+        <p role="alert" className={ui.alertError}>
+          {error}
+        </p>
+      )}
       <button type="submit" disabled={loading} className={`w-full ${ui.btnPrimary}`}>
         {loading ? 'Please wait…' : mode === 'signup' ? 'Create account' : 'Sign in'}
       </button>
@@ -110,6 +114,7 @@ export function AuthForm ({ mode }: { mode: 'login' | 'signup' }) {
             rel="noreferrer"
           >
             checklist
+            <span className="sr-only"> (opens in new tab)</span>
           </a>
         </p>
       )}

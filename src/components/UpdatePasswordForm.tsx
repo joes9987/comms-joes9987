@@ -68,7 +68,11 @@ export function UpdatePasswordForm () {
       <button type="submit" disabled={loading} className={`w-full ${ui.btnPrimary}`}>
         {loading ? 'Saving…' : 'Update password'}
       </button>
-      {error && <p className={ui.alertError}>{error}</p>}
+      {error && (
+        <p role="alert" className={ui.alertError}>
+          {error}
+        </p>
+      )}
     </form>
   )
 }

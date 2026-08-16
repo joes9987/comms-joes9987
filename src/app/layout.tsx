@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { IBM_Plex_Mono, IBM_Plex_Sans, Syne } from 'next/font/google'
+import { SkipToContent } from '@/components/SkipToContent'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import './globals.css'
 
@@ -35,6 +36,7 @@ export default function RootLayout ({
     <html lang="en" suppressHydrationWarning>
       <body className={`${syne.variable} ${plexSans.variable} ${plexMono.variable} min-h-screen antialiased mesh-background`}>
         <ThemeProvider>
+          <SkipToContent />
           {children}
         </ThemeProvider>
       </body>

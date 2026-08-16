@@ -1,4 +1,4 @@
-﻿import type { SupabaseClient } from '@supabase/supabase-js'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Message, Notification, Profile } from '@/lib/types'
 
 type CurrentUserLite = {

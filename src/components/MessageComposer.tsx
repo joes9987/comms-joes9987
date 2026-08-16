@@ -7,11 +7,12 @@ import { createClient } from '@/lib/supabase/client'
 import { ui } from '@/lib/ui'
 
 type MessageComposerProps = {
+  label: string
   placeholder: string
   onSend: (body: string) => Promise<{ error: string | null }>
 }
 
-export function MessageComposer ({ placeholder, onSend }: MessageComposerProps) {
+export function MessageComposer ({ label, placeholder, onSend }: MessageComposerProps) {
   const { profiles } = useAppData()
   const [value, setValue] = useState('')
   const [sending, setSending] = useState(false)
@@ -70,22 +71,30 @@ export function MessageComposer ({ placeholder, onSend }: MessageComposerProps) 
           ))}
         </div>
       )}
-      {error && <p className={`${ui.alertError} mb-2`}>{error}</p>}
+      {error && (
+        <p role="alert" className={`${ui.alertError} mb-2`}>
+          {error}
+        </p>
+      )}
       <div className="flex items-end gap-2">
-        <textarea
-          ref={textareaRef}
-          rows={1}
-          value={value}
-          placeholder={placeholder}
-          className={`${ui.field} max-h-32 resize-none`}
-          onChange={(e) => handleChange(e.target.value, e.target.selectionStart ?? e.target.value.length)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey && !mentionMenu) {
-              e.preventDefault()
-              void submit()
-            }
-          }}
-        />
+        <label className="min-w-0 flex-1">
+          <span className="sr-only">{label}</span>
+          <textarea
+            ref={textareaRef}
+            rows={1}
+            value={value}
+            placeholder={placeholder}
+            aria-label={label}
+            className={`${ui.field} mt-0 max-h-32 resize-none`}
+            onChange={(e) => handleChange(e.target.value, e.target.selectionStart ?? e.target.value.length)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey && !mentionMenu) {
+                e.preventDefault()
+                void submit()
+              }
+            }}
+          />
+        </label>
         <button
           type="button"
           disabled={sending || !value.trim()}

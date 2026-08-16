@@ -11,7 +11,7 @@ import type { Profile } from '@/lib/types'
 export default async function AppLayout ({ children }: { children: React.ReactNode }) {
   if (!isSupabaseConfigured()) {
     return (
-      <main className={`${ui.meshBg} mx-auto max-w-3xl px-4 py-16`}>
+      <main id="main-content" tabIndex={-1} className={`${ui.meshBg} mx-auto max-w-3xl px-4 py-16`}>
         <h1 className={ui.pageTitle}>EudaChat is not configured</h1>
         <p className={`mt-2 ${ui.pageSubtitle}`}>
           Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to enable auth and chat.

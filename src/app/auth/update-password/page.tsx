@@ -15,7 +15,7 @@ export default async function UpdatePasswordPage () {
   if (!user) redirect('/forgot-password')
 
   return (
-    <main className={`${ui.meshBg} relative flex min-h-screen flex-col justify-center px-4 py-16`}>
+    <main id="main-content" tabIndex={-1} className={`${ui.meshBg} relative flex min-h-screen flex-col justify-center px-4 py-16`}>
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>

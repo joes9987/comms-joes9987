@@ -26,8 +26,10 @@ function formatTimestamp (iso: string): string {
 export function MessageThread ({ target, initialMessages }: MessageThreadProps) {
   const { currentUser, profileMap } = useAppData()
   const [messages, setMessages] = useState(initialMessages)
+  const [liveAnnouncement, setLiveAnnouncement] = useState('')
   const sender = useMessageSender()
   const bottomRef = useRef<HTMLDivElement>(null)
+  const prevCountRef = useRef(initialMessages.length)
 
   useEffect(() => {
     const supabase = createClient()
@@ -53,6 +55,27 @@ export function MessageThread ({ target, initialMessages }: MessageThreadProps) 
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages.length])
 
+  useEffect(() => {
+    const prev = prevCountRef.current
+    if (messages.length > prev) {
+      const added = messages.length - prev
+      const newest = messages[messages.length - 1]
+      const author = profileMap[newest.author_id]
+      const name = newest.author_id === currentUser.id ? 'You' : profileLabel(author)
+      setLiveAnnouncement(
+        added === 1 ? `New message from ${name}` : `${added} new messages, latest from ${name}`
+      )
+    }
+    prevCountRef.current = messages.length
+  }, [messages, profileMap, currentUser.id])
+
+  useEffect(() => {
+    prevCountRef.current = initialMessages.length
+    setMessages(initialMessages)
+    setLiveAnnouncement('')
+  }, [target.id, target.type])
+
+  const title = target.type === 'dm' ? target.peerName : target.name
   const canPost = target.type === 'dm' || (!target.archived && (!target.announcements || currentUser.isAdmin))
   const readOnlyReason = target.type === 'channel'
     ? target.archived
@@ -64,7 +87,27 @@ export function MessageThread ({ target, initialMessages }: MessageThreadProps) 
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
+      <div className="border-b border-[var(--border)] px-4 py-3 sm:px-6">
+        <h1 className="font-display text-lg font-bold tracking-tight text-[var(--foreground)]">
+          {target.type === 'channel' ? (
+            <>
+              <span aria-hidden="true">{target.announcements ? '📣 ' : '# '}</span>
+              {title}
+            </>
+          ) : (
+            title
+          )}
+        </h1>
+        {target.type === 'channel' && target.archived && (
+          <p className="mt-0.5 text-xs text-[var(--muted)]">Archived</p>
+        )}
+      </div>
+
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {liveAnnouncement}
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6" aria-label="Messages">
         {messages.length === 0 && (
           <p className="mt-10 text-center text-sm text-[var(--muted)]">
             No messages yet. Say hello{target.type === 'dm' ? ` to ${target.peerName}` : ''}.
@@ -108,6 +151,7 @@ export function MessageThread ({ target, initialMessages }: MessageThreadProps) 
 
       {canPost ? (
         <MessageComposer
+          label={target.type === 'dm' ? `Message ${target.peerName}` : `Message #${target.slug}`}
           placeholder={target.type === 'dm' ? `Message ${target.peerName}` : `Message #${target.slug}`}
           onSend={(body) =>
             target.type === 'channel'
@@ -116,7 +160,7 @@ export function MessageThread ({ target, initialMessages }: MessageThreadProps) 
           }
         />
       ) : (
-        <div className={`${ui.alertWarning} m-4`}>{readOnlyReason}</div>
+        <div className={`${ui.alertWarning} m-4`} role="status">{readOnlyReason}</div>
       )}
     </div>
   )

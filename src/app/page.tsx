@@ -16,7 +16,7 @@ export default async function HomePage () {
   }
 
   return (
-    <main className={`${ui.meshBg} relative flex min-h-screen flex-col`}>
+    <main id="main-content" tabIndex={-1} className={`${ui.meshBg} relative flex min-h-screen flex-col`}>
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-6">
         <div className="flex items-center gap-3">
           <EudaChatLogo />
