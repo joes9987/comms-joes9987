@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { AppChrome } from '@/components/AppChrome'
+import { LocaleThemeBridge } from '@/components/LocaleThemeBridge'
 import { AppDataProvider } from '@/lib/app-context'
 import { getChannels, getDmThreads, getProfiles } from '@/lib/chat-server'
 import { fetchUserNotifications } from '@/lib/notifications'
@@ -50,6 +51,7 @@ export default async function AppLayout ({ children }: { children: React.ReactNo
 
   return (
     <AppDataProvider currentUser={currentUser} profiles={profiles}>
+      <LocaleThemeBridge locale={profile?.locale} />
       <AppChrome channels={channels} dmThreads={dmThreads} initialNotifications={notifications}>
         {children}
       </AppChrome>

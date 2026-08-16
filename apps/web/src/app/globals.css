@@ -291,3 +291,32 @@ a:focus-visible {
 .btn-primary:focus-visible {
   color: var(--primary-fg);
 }
+
+/* T&T theme — opt-in via profiles.locale = tcr (Phase 7). Orthogonal to .dark. */
+.tt-mode {
+  --primary: #a8d600;
+  --primary-hover: #94be00;
+  --primary-fg: #1f2700;
+  --accent: #ce1126;
+  --accent-soft: rgba(206, 17, 38, 0.12);
+  --accent-foreground: #ce1126;
+  --highlight: #ce1126;
+  --highlight-soft: rgba(206, 17, 38, 0.14);
+  --glow-1: rgba(168, 214, 0, 0.22);
+  --glow-2: rgba(206, 17, 38, 0.12);
+  --glow-highlight: rgba(168, 214, 0, 0.28);
+  --nav-active: rgba(168, 214, 0, 0.16);
+  --nav-active-fg: #587100;
+}
+
+.dark.tt-mode {
+  --primary: #c6ef3a;
+  --primary-hover: #d7f56a;
+  --primary-fg: #1f2700;
+  --accent: #ef4d61;
+  --accent-soft: rgba(239, 77, 97, 0.16);
+  --accent-foreground: #ffb3bc;
+  --highlight: #ef4d61;
+  --nav-active: rgba(198, 239, 58, 0.14);
+  --nav-active-fg: #e7f3bd;
+}

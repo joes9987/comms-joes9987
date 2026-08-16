@@ -37,6 +37,11 @@ pnpm seed:reviewer
 | Notifications | Bell after DM / `@mention` |
 | Theme / appearance | Header toggle + profile settings |
 | Staff gate | `/app/staff` should deny non-admins |
+| Feed | `/app/feed` — post, like, comment, follow |
+| Discover | `/app/discover` — search posts and #tags |
+| Status | `/app/status/new` — 24h story |
+| T&T theme | Profile → Creole checkbox turns on lime/flag palette |
+| Calls stub | `/app/calls` — token mint (stub without LiveKit keys) |
 
 ## RLS / security notes
 

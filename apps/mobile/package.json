@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "dev": "echo \"Run: npx expo start (after npx expo install in apps/mobile)\"",
     "build": "node -e \"process.exit(0)\"",
-    "dev": "node -e \"process.exit(0)\"",
     "lint": "node -e \"process.exit(0)\"",
     "test": "node -e \"process.exit(0)\"",
     "typecheck": "node -e \"process.exit(0)\""

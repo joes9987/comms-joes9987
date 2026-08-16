@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "EudaChat",
+    "slug": "eudachat",
+    "scheme": "eudachat",
+    "version": "0.0.1",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

@@ -1,3 +1,3 @@
 # @euda/ui
 
-Empty stub. Shared UI primitives are populated in a later phase. `@euda/web` does not depend on this package yet.
+Shared visual tokens for EudaChat. `eudaTtColors` is the T&T flag palette (red `#CE1126`, white, black) plus lime `#A8D600` — import from `./src/theme`.
