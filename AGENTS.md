@@ -30,7 +30,8 @@ messages, an admin-only announcements channel, keyword search, and realtime upda
 `profiles` (1:1 with `auth.users`, auto-created by trigger; shared with EudaPM) → `channels`
 (public/announcements) → `messages` (exactly one of `channel_id` / `dm_thread_id`) →
 `chat_notifications` (DM + `@mention` alerts via security-definer triggers; **not** PM’s
-`notifications` table). Private DOB lives in `profile_private` (owner-only RLS).
+`notifications` table). Private DOB lives in `profile_private` (owner-only RLS). Social
+feed tables (`posts`, `follows`, `statuses`, `blocks`, …) are in `007_social_graph.sql`.
 
 See [supabase/migrations/](supabase/migrations/) for schema, RLS, and storage policies.
 
