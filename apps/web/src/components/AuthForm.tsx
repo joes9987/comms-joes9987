@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { GoogleAuthButton } from '@/components/GoogleAuthButton'
 import { createClient } from '@/lib/supabase/client'
 import { ui } from '@/lib/ui'
 
@@ -11,6 +12,7 @@ export function AuthForm ({ mode }: { mode: 'login' | 'signup' }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
+  const [useCreole, setUseCreole] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -26,7 +28,10 @@ export function AuthForm ({ mode }: { mode: 'login' | 'signup' }) {
         email,
         password,
         options: {
-          data: { display_name: displayName || email.split('@')[0] }
+          data: {
+            display_name: displayName || email.split('@')[0],
+            locale: useCreole ? 'tcr' : 'en'
+          }
         }
       })
       if (signUpError) {
@@ -53,15 +58,28 @@ export function AuthForm ({ mode }: { mode: 'login' | 'signup' }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {mode === 'signup' && (
-        <label className={ui.label}>
-          Display name
-          <input
-            className={ui.field}
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            placeholder="Joseph Singh"
-          />
-        </label>
+        <>
+          <label className={ui.label}>
+            Display name
+            <input
+              className={ui.field}
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="Joseph Singh"
+            />
+          </label>
+          <label className="flex items-start gap-3 text-sm text-[var(--muted-foreground)]">
+            <input
+              type="checkbox"
+              className="mt-1"
+              checked={useCreole}
+              onChange={(e) => setUseCreole(e.target.checked)}
+            />
+            <span>
+              Use Trinidadian Creole when it is available. Leave unchecked for English.
+            </span>
+          </label>
+        </>
       )}
       <label className={ui.label}>
         Email
@@ -100,6 +118,12 @@ export function AuthForm ({ mode }: { mode: 'login' | 'signup' }) {
       <button type="submit" disabled={loading} className={`w-full ${ui.btnPrimary}`}>
         {loading ? 'Please wait…' : mode === 'signup' ? 'Create account' : 'Sign in'}
       </button>
+      <div className="flex items-center gap-3 text-xs uppercase tracking-[0.16em] text-[var(--muted)]">
+        <span className="h-px flex-1 bg-[var(--border)]" />
+        or
+        <span className="h-px flex-1 bg-[var(--border)]" />
+      </div>
+      <GoogleAuthButton next="/onboarding" />
       {mode === 'login' && (
         <p className="rounded-lg border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-xs text-[var(--muted-foreground)]">
           Peer reviewer demo:{' '}

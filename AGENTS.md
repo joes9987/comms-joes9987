@@ -27,7 +27,7 @@ messages, an admin-only announcements channel, keyword search, and realtime upda
 
 ## Data model quick reference
 
-`profiles` (1:1 with `auth.users`, auto-created by trigger; shared with EudaPM) → `channels`
+`profiles` (1:1 with `auth.users`, auto-created by trigger; shared with EudaPM; `locale` is `en` or opt-in `tcr`) → `channels`
 (public/announcements) → `messages` (exactly one of `channel_id` / `dm_thread_id`) →
 `chat_notifications` (DM + `@mention` alerts via security-definer triggers; **not** PM’s
 `notifications` table). Private DOB lives in `profile_private` (owner-only RLS). Social
@@ -58,6 +58,8 @@ Seed Chat-owned tables only; never post sample spam into `#general`.
 - `/forgot-password` → `resetPasswordForEmail` → `/auth/callback?next=/auth/update-password`
 - Shared Supabase project with EudaPM / EudaMarket — one password, per-host cookies
 - Auth redirect allowlist must include `https://comms-joes9987.vercel.app/auth/callback`
+- Google OAuth uses the same callback. Enable the Google provider on the shared Supabase project
+  before the button will complete. Locale lives on `profiles.locale` (`en` | `tcr`, default `en`).
 
 ## Deploy
 

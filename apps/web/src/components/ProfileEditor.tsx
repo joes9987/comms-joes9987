@@ -5,6 +5,7 @@ import { useRef, useState } from 'react'
 import { AppearanceSettings } from '@/components/AppearanceSettings'
 import { Avatar } from '@/components/Avatar'
 import { ProfileCard } from '@/components/ProfileCard'
+import { parseLocale } from '@/lib/locale'
 import { createClient } from '@/lib/supabase/client'
 import { ui } from '@/lib/ui'
 import type { Profile } from '@/lib/types'
@@ -46,6 +47,7 @@ export function ProfileEditor ({ profile }: ProfileEditorProps) {
   const [handle, setHandle] = useState(profile.handle)
   const [bio, setBio] = useState(profile.bio ?? '')
   const [dob, setDob] = useState(profile.date_of_birth ?? '')
+  const [useCreole, setUseCreole] = useState(parseLocale(profile.locale) === 'tcr')
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url ?? null)
   const [bannerUrl, setBannerUrl] = useState(profile.banner_url ?? null)
   const [loading, setLoading] = useState(false)
@@ -173,7 +175,8 @@ export function ProfileEditor ({ profile }: ProfileEditorProps) {
       .update({
         display_name: displayName.trim() || profile.display_name,
         handle: nextHandle,
-        bio: bio.trim() || null
+        bio: bio.trim() || null,
+        locale: useCreole ? 'tcr' : 'en'
       })
       .eq('id', profile.id)
 
@@ -341,6 +344,17 @@ export function ProfileEditor ({ profile }: ProfileEditorProps) {
           />
           <span className="mt-1 block text-xs font-normal text-[var(--muted)]">
             Used for @mentions · letters, numbers, underscore
+          </span>
+        </label>
+        <label className="flex items-start gap-3 text-sm text-[var(--muted-foreground)]">
+          <input
+            type="checkbox"
+            className="mt-1"
+            checked={useCreole}
+            onChange={(e) => setUseCreole(e.target.checked)}
+          />
+          <span>
+            Use Trinidadian Creole when it is available. English is the default.
           </span>
         </label>
         <label className={ui.label}>

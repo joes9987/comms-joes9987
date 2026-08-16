@@ -29,6 +29,7 @@ pnpm seed:reviewer
 |------|-------|
 | Marketing home + demo creds | `/` |
 | Login / signup / password reset | `/login`, `/signup`, `/forgot-password` |
+| Google + onboarding (optional) | `/login` → Continue with Google → `/onboarding` (needs Google provider enabled) |
 | Demo channel | `/app/c/reviewer-demo` |
 | Cohort channels | `#general`, `#random`, `#help`, Announcements (read-only unless staff) |
 | Direct messages | Sidebar DM with demo peer |
