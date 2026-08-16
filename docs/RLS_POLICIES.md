@@ -17,4 +17,4 @@ A fresh `supabase db reset` / SQL editor apply of `001`→`006` recreates these 
 migrations add handle/admin columns and admin manage policy; they do not redefine PM’s core
 profile select/update policies.
 
-Automated coverage: [`tests/rls/security.test.ts`](../tests/rls/security.test.ts) (CI).
+Automated coverage: [`apps/web/tests/rls/security.test.ts`](../apps/web/tests/rls/security.test.ts) (CI).
