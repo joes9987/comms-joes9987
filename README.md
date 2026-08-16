@@ -41,6 +41,12 @@ Browser (React)
 | `dm_threads` | One row per unique unordered pair of profiles (`user_a < user_b`, unique) |
 | `messages` | Belongs to exactly one of `channel_id` / `dm_thread_id` (checked in SQL) |
 | `chat_notifications` | In-app alerts for DMs and `@mentions` (PM already owns `notifications`) |
+| `follows` / `close_friends` | Directed follow graph; owner-only close-friends list |
+| `posts` / `comments` / `likes` / `hashtags` | Public feed (reposts via `posts.reposted_from`) |
+| `statuses` | 24h stories (`public` or `close_friends`; E2EE ciphertext reserved) |
+| `blocks` / `mutes` / `reports` | Safety primitives; staff review UI comes later |
+| Storage `post-media` | Public images/video for posts |
+| Storage `chat-blob` / `status-blob` | Private encrypted blobs (E2EE later) |
 
 RLS highlights (full inventory: [docs/RLS_POLICIES.md](docs/RLS_POLICIES.md)):
 
@@ -65,9 +71,9 @@ pnpm install
 ```
 
 2. Create a Supabase project (or use an existing one) and run
-   [`supabase/migrations/001_init.sql`](supabase/migrations/001_init.sql) in the SQL editor (or via
-   `supabase db push`). It creates the schema, RLS policies, triggers, and seeds the `general`,
-   `random`, `help`, and `announcements` channels.
+   [`supabase/migrations/`](supabase/migrations/) (`001` through `007`) in the SQL editor (or via
+   `supabase db push`). `001` creates channels/DMs/messages and seeds `general`, `random`, `help`,
+   and `announcements`. `007` adds the social-graph / feed tables.
 
 3. Copy the committed env template:
 
@@ -130,6 +136,7 @@ Requires `SUPABASE_SERVICE_ROLE_KEY` in `apps/web/.env.local`. Without it, live 
 - [x] Discord-style profile popover from chat names, avatars, and `@mentions`
 - [x] Personal app background presets + custom wallpaper (local to this browser)
 - [x] Vitest RLS suite + GitHub Actions CI (DM isolation, mention privacy, staff escalation, channel update)
+- [x] Social-graph schema (`007_social_graph.sql`) — posts, follows, statuses, blocks/mutes/reports; no feed UI yet
 
 ## Known limitations
 
